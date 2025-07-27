@@ -37,6 +37,7 @@ const Index = () => {
       
       if (generatedImages.length > 0) {
         setAppState("gallery");
+        setIsSidebarOpen(false)
         toast.success(`Successfully generated ${generatedImages.length} LinkedIn ads!`);
       } else {
         toast.error("Failed to generate images. Please try again.");

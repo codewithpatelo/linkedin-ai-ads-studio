@@ -25,7 +25,6 @@ Make sure to add .env file with OPEN AI API KEYS.
 
 Then:
 
-
 ```bash
 make quick-dev
 ```
