@@ -42,7 +42,11 @@ export const CompanyForm = ({ onSubmit, isGenerating, progressMessage, currentSt
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const isFormValid = Object.values(formData).every(value => value.trim() !== "");
+  // Only require essential fields, bodyText and footerText are optional for AI generation
+  const isFormValid = formData.companyUrl.trim() !== "" && 
+                     formData.productName.trim() !== "" && 
+                     formData.businessValue.trim() !== "" && 
+                     formData.audience.trim() !== "";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6">
@@ -137,32 +141,40 @@ export const CompanyForm = ({ onSubmit, isGenerating, progressMessage, currentSt
 
               {/* Body Text */}
               <div className="space-y-2">
-                <Label htmlFor="bodyText" className="text-sm font-medium flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  Ad Body Text
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="bodyText" className="text-sm font-medium flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-primary" />
+                    Ad Body Text
+                  </Label>
+                  <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded-full">
+                    ✨ Leave blank for AI magic
+                  </span>
+                </div>
                 <Textarea
                   id="bodyText"
                   placeholder="Slow response times and missed emails weaken trust and put businesses at a disadvantage..."
                   value={formData.bodyText}
                   onChange={(e) => handleChange("bodyText", e.target.value)}
                   className="min-h-[120px] bg-background/50 resize-none input-focus"
-                  required
                 />
               </div>
 
               {/* Footer Text */}
               <div className="space-y-2">
-                <Label htmlFor="footerText" className="text-sm font-medium">
-                  Call-to-Action Text
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="footerText" className="text-sm font-medium">
+                    Call-to-Action Text
+                  </Label>
+                  <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded-full">
+                    ✨ Leave blank for AI magic
+                  </span>
+                </div>
                 <Input
                   id="footerText"
                   placeholder="Boost Client Trust: Respond to Emails 3x Faster with Superhuman!"
                   value={formData.footerText}
                   onChange={(e) => handleChange("footerText", e.target.value)}
                   className="bg-background/50 input-focus"
-                  required
                 />
               </div>
 

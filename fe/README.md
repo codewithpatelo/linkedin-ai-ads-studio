@@ -30,7 +30,7 @@ The application will be available at `http://localhost:8080`
 ### Key Design Decisions
 
 1. **Design System First**: All styles defined through CSS custom properties and Tailwind configuration
-2. **Progressive Enhancement**: Form validation and user feedback at every step
+2. **Progressive Enhancement**: Form validation and user visual feedback at every step
 3. **Responsive Grid Layouts**: Adapts seamlessly from mobile to desktop
 4. **Professional Aesthetic**: LinkedIn-inspired color scheme with modern gradients
 
@@ -53,12 +53,10 @@ The application will be available at `http://localhost:8080`
 
 ### Assumptions
 - Users have basic familiarity with LinkedIn advertising
-- Company URLs are publicly accessible for branding context
+- Company URLs are publicly accessible for branding context and related to CTAs
 - Target audience can be described in text format
 
 ### Current Limitations
-- **Mock Image Generation**: Using placeholder images instead of real AI generation
-- **No Backend Integration**: All processing happens client-side
 - **Limited Customization**: Predefined style templates (extensible in production)
 - **No User Accounts**: Session-based, no persistence
 
