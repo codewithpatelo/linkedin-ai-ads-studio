@@ -1,4 +1,4 @@
-# AI-Powered LinkedIn Ads Image Generation Studio
+# 🚀 AI-Powered LinkedIn Ads Image Generation Studio
 
 ![UX](gui.gif)
 
@@ -8,13 +8,13 @@ The UX is simple. Users fill out a form with product name, company URL, target a
 
 The pipeline is as follows:
 
-1. Company Analysis: Based on user input, the system analyzes the company to understand their brand and context.
-2. Reference Loading: The system loads 3-5 LinkedIn ad examples to improve generation quality.
-3. Prompt Enhancement: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
-4. Image Generation: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
-5. Image Modification: The system modifies the images to improve the quality of the generated images.
+1. 🔍 **Company Analysis**: Based on user input, the system analyzes the company to understand their brand and context.
+2. 🖼️ **Reference Loading**: The system loads 3-5 LinkedIn ad examples to improve generation quality.
+3. ✨ **Prompt Enhancement**: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
+4. 🎨 **Image Generation**: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
+5. 🔄 **Image Modification**: The system modifies the images to improve the quality of the generated images.
 
-## Quick Setup
+## ⚡ Quick Setup
 To make things easy. We used MAKEFILES.
 
 At root level, just do:
@@ -22,7 +22,7 @@ At root level, just do:
 ```bash
 make setup
 ```
-Make sure to add .env file with OPENAI API KEYS.
+Make sure to add FE .env and BE .env file with OPENAI API KEYS. Optionally, you can enable Langsmith which is fully supported in this repository.
 
 Then:
 
@@ -31,7 +31,7 @@ make quick-dev
 ```
 
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 linkedin-ads/
@@ -107,9 +107,9 @@ linkedin-ads/
             └── api.ts          # API client with streaming support
 ```
 
-## Features
+## ✨ Features
 
-### Core Functionality
+### 🔧 Core Functionality
 - **Real-time Streaming**: Server-Sent Events (SSE) for live progress updates
 - **AI-Enhanced Prompts**: GPT-4o powered prompt optimization with reference images
 - **Professional Ad Copy**: Auto-generated headlines, descriptions, and CTAs
@@ -131,7 +131,7 @@ linkedin-ads/
 - **Image Gallery**: Professional display with modification options
 - **Form Validation**: Comprehensive input validation and error handling
 
-### API Endpoints
+### 🔌 API Endpoints
 - `POST /api/v1/stream/generate` - **Streaming generation** with real-time progress (recommended)
 - `POST /api/v1/images/generate` - Standard generation endpoint
 - `POST /api/v1/images/modify` - Modify existing images with feedback
@@ -154,20 +154,20 @@ linkedin-ads/
 
 ## Technical Approach
 
-### Architecture Decisions
+### 🏗️ Architecture Decisions
 
-1. **Real-time Streaming Architecture**
+1. **🔄 Real-time Streaming Architecture**
    - Server-Sent Events (SSE) for live progress updates
    - Async streaming with proper error handling and connection management
    - Frontend state management for real-time UI updates
 
-2. **AI-First Design**
+2. **🧠 AI-First Design**
    - **Workflow-Based**: Multi-step AI pipeline (company analysis → reference loading → optimized prompt generation → image generation)
    - **GPT-4o Integration**: Advanced prompt optimization with context awareness
    - **Reference Image System**: Uses 3-5 LinkedIn ad examples to improve generation quality
    - **Fallback Mechanisms**: Graceful degradation when AI services are unavailable
 
-3. **Modern Frontend Architecture**
+3. **💻 Modern Frontend Architecture**
    - **React + TypeScript**: Type-safe component architecture
    - **Custom Hooks**: Centralized state management with `useImageGeneration`
    - **Sidebar Console**: Developer-friendly real-time progress display
@@ -187,9 +187,9 @@ linkedin-ads/
 - **Custom Hooks**: React state management with `useImageGeneration`
 - **Component Composition**: Modular UI components with clear responsibilities
 
-## Example Usage
+## 📝 Example Usage
 
-### Generate Images Request
+### 🖼️ Generate Images Request
 ```json
 {
   "company_url": "https://superhuman.com/",
@@ -219,15 +219,15 @@ linkedin-ads/
 }
 ```
 
-## Key Decisions & Trade-offs
+## 🔑 Key Decisions & Trade-offs
 
-### Technical Decisions
+### 🛠️ Technical Decisions
 1. **Real-time Streaming**: Chose SSE over WebSockets for simplicity and better browser compatibility
 2. **In-memory Storage**: Prioritized development speed over persistence (production would use database)
 3. **Reference Images**: Local file system storage for MVP, cloud storage for production
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
 
-### Trade-offs Made
+### ⚖️ Trade-offs Made
 1. **Streaming vs Simplicity**: Added complexity for better user experience
 2. **AI Enhancement vs Speed**: Slower generation for higher quality prompts
 3. **Console View vs Simple UI**: Developer-friendly interface over simplified design
@@ -235,13 +235,13 @@ linkedin-ads/
 5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrificed some commit history.
 
 
-### Assumptions
+### 🔮 Assumptions
 - Users have valid OpenAI API keys with DALL-E 3 access
 - LinkedIn ad format requirements (1:1 or 4:5 aspect ratios)
 - Modern browser support for SSE and ES6+ features
 - Development environment with Python 3.11+ and Node.js 18+
 
-### Current Limitations
+### 🚧 Current Limitations
 1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. A tweak to solve this for further iterations is to complement DALL-E with something like pillow to add those texts.
 2. **No persistent storage**: Images stored in memory only
 3. **Some steps take long**: Some steps take longer than others, which can lead to a bad user experience. Cache, token optimization, and parallelization are some solutions to this problem.
@@ -251,27 +251,27 @@ linkedin-ads/
 7. **Modification feature**: While we take the original image as input, DALL-E 3 will probably vary the image considerably due to its own limitations.
 
 
-## Future Enhancements
+## 🚀 Future Enhancements
 
-1. **LinkedIn Campaign Manager Integration**: Use LinkedIn Campaign Manager to create and manage campaigns
-2. **Caching**: Redis for frequently requested data
-3. **Background Processing**: Celery for async image generation
-4. **Add texts to images**: Use pillow to add high-contrast texts to images
-5. **Advanced Analytics**: LangSmith integration for prompt performance
-6. **Web Scraping**: Automated company information extraction
-7. **A/B Testing**: Comparison and production of multiple prompt strategies, multiple CTAs, multiple body texts.
+1. **🔗 LinkedIn Campaign Manager Integration**: Use LinkedIn Campaign Manager to create and manage campaigns
+2. **⚡ Caching**: Redis for frequently requested data
+3. **🔄 Background Processing**: Celery for async image generation
+4. **📝 Add texts to images**: Use pillow to add high-contrast texts to images
+5. **📊 Advanced Analytics**: LangSmith integration for prompt performance
+6. **🕸️ Web Scraping**: Automated company information extraction
+7. **🔬 A/B Testing**: Comparison and production of multiple prompt strategies, multiple CTAs, multiple body texts.
 
-## Review Focus Points
+## 🔍 Review Focus Points
 
-1. **Real-time Architecture**: SSE streaming implementation and frontend state management
-2. **AI Integration**: Workflow design and GPT-4o prompt optimization
-3. **Component Design**: React component architecture and TypeScript usage
-4. **User Experience**: Sidebar console design and real-time progress feedback
-5. **Code Quality**: Clean separation of concerns and maintainable structure
-6. **Error Handling**: Graceful degradation and comprehensive error boundaries
-7. **Performance**: Async processing, memory efficiency, and concurrent operations
+1. **⚡ Real-time Architecture**: SSE streaming implementation and frontend state management
+2. **🧠 AI Integration**: Workflow design and GPT-4o prompt optimization
+3. **🧩 Component Design**: React component architecture and TypeScript usage
+4. **👤 User Experience**: Sidebar console design and real-time progress feedback
+5. **✅ Code Quality**: Clean separation of concerns and maintainable structure
+6. **🛡️ Error Handling**: Graceful degradation and comprehensive error boundaries
+7. **⚡ Performance**: Async processing, memory efficiency, and concurrent operations
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Backend
 - **Framework**: FastAPI with Python 3.11+
@@ -286,7 +286,7 @@ linkedin-ads/
 - **Notifications**: Sonner toast library
 - **State Management**: Custom hooks with React state
 
-### Development
+### 👨‍💻 Development
 - **Code Quality**: ESLint, Prettier, TypeScript strict mode
 - **API Client**: Custom service layer with streaming support
 - **Environment**: Node.js 18+, Python 3.11+
