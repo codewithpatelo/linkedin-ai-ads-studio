@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Backend API service
+  backend:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    container_name: linkedin-ads-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY:-}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2:-false}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT:-linkedin-ads-studio}
+      - FASTAPI_ENV=${FASTAPI_ENV:-production}
+    env_file:
+      - ./be/.env
+    volumes:
+      - ./be:/app:ro  # Read-only for security
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - linkedin-ads-network
+
+  # Frontend React app
+  frontend:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000/api/v1
+    container_name: linkedin-ads-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - linkedin-ads-network
+
+networks:
+  linkedin-ads-network:
+    driver: bridge
+    name: linkedin-ads-network
+
+volumes:
+  # Optional: Add volumes for persistent data if needed in the future
+  backend_data:
+    driver: local
