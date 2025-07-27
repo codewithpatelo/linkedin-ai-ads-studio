@@ -153,7 +153,7 @@ class ImageGenerationService:
                     continue
 
                 style_prompt = f"""
-        Create a highly-optimized DALL-E 3 prompt for a LinkedIn ad image with people on a simple background and a CTA text with high-contrass background.
+        Create a highly-optimized DALL-E 3 prompt for a LinkedIn ad image with people (1 or 2 people max) on a simple background and a CTA text with high-contrass background.
         
         Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES + CTA OPTIMIZATION
 
@@ -167,7 +167,7 @@ class ImageGenerationService:
 
         **DALL-E Prompt Requirements:**
 
-        1. **Main Subject:** Professional business people representing {state.request.audience}
+        1. **Main Subject:** Professional business people (not more than 1 or 2 people) representing {state.request.audience}
            - Confident, approachable expression
            - Professional business attire appropriate for the industry
            - Diverse representation (vary ethnicity, age, gender)
@@ -201,7 +201,7 @@ class ImageGenerationService:
         - Professional B2B appeal
         
         **Critical Technical Requirements**:
-        - Photorealistic quality with simple background and CTA texts should contrass that background.
+        - People portraited with photorealistic quality with simple background and CTA texts that should contrass that background.
         - LinkedIn-optimized composition (1:1 aspect ratio preferred)
         - HIGH CONTRAST backgrounds (light backgrounds for dark text, dark backgrounds for light text)
         - Professional lighting for people on the image (studio quality, natural daylight, warm professional tones)
@@ -223,7 +223,7 @@ class ImageGenerationService:
         4. **Technical Photography**: Include "shot on Canon 5D with 50mm lens, studio lighting, shallow depth of field for pictures portraited in the image"
         5. **Audience Empathy**: Diverse, authentic professionals representing {state.request.audience} 
         6. **B2B Credibility**: Thought leadership positioning, expertise signals related to {state.request.business_value}
-        7. **Emotional Tone**: Specify mood that aligns with the target audience and business context
+        7. **Emotional Tone**: Specify mood that aligns with the target audience and business context and address the audience pain points.
         8. **CTA Optimization**: High contrast areas specifically designed for text overlay of "{state.request.footer_text or 'Learn More'}"
         9. **Color Contrast**: Specify background colors that provide high contrast for white/dark text overlay.
         10. **Mobile Optimization**: Clear visual hierarchy optimized for 1200x1200px LinkedIn format
