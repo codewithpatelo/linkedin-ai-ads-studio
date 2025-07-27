@@ -1,6 +1,6 @@
 # LinkedIn Ads Image Generation Studio
 
-![alt text](image.png)
+![UX](gui.gif)
 
 An AI-powered image generation platform that creates professional LinkedIn advertisement images with real-time streaming progress, enhanced prompt generation, and professional ad copy enhancement.
 
@@ -9,9 +9,10 @@ The UX is simple. User fills up a form with product name, company URL, targets a
 The pipeline is as follows:
 
 1. Company Analysis: Based on user input, the system analyzes the company to understand their brand and context.
-2. Prompt Enhancement: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
-3. Image Generation: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
-4. Image Modification: The system modifies the images to improve the quality of the generated images.
+2. Reference Loading: The system loads 3-5 LinkedIn ad examples to improve generation quality.
+3. Prompt Enhancement: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
+4. Image Generation: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
+5. Image Modification: The system modifies the images to improve the quality of the generated images.
 
 ## Quick Setup
 To make things easy. We used MAKEFILES.
@@ -34,27 +35,76 @@ make quick-dev
 
 ```
 linkedin-ads/
-├── be/                          # Backend (FastAPI + Python 3.11)
+├── LICENSE                     # MIT License
+├── Makefile                    # Root-level build automation
+├── README.md                   # Project documentation
+├── docker-compose.yml          # Production Docker setup
+├── docker-compose.dev.yml      # Development Docker setup
+├── debug_storage.py            # Debug utilities
+│
+├── be/                         # Backend (FastAPI + Python 3.11)
+│   ├── Dockerfile              # Backend container configuration
+│   ├── Makefile                # Backend build automation
 │   ├── main.py                 # FastAPI application entry point
 │   ├── models.py               # Pydantic models for API
+│   ├── config.py               # Configuration management
 │   ├── requirements.txt        # Python dependencies
-│   ├── datasets/ref_imgs/      # Reference LinkedIn ad images
+│   ├── start.sh                # Production startup script
+│   ├── datasets/
+│   │   └── ref_imgs/           # Reference LinkedIn ad images (26 examples)
+│   │       ├── main_ref.jpg    # Primary reference image
+│   │       ├── main_ref2.jpg   # Additional main references
+│   │       └── *.png           # Various LinkedIn ad examples
 │   ├── routers/
+│   │   ├── __init__.py
 │   │   ├── image_generation.py # Standard image generation API
-│   │   └── streaming.py        # Real-time streaming API
+│   │   └── streaming.py        # Real-time streaming API with SSE
 │   └── services/
-│       └── image_service.py    # Core business logic with LangGraph
+│       ├── __init__.py
+│       ├── image_service.py    # Core business logic 
+│       └── langgraph_workflow.py # Workflow definitions
+│
 └── fe/                         # Frontend (React + TypeScript + Vite)
-    ├── src/
-    │   ├── components/         # UI components
-    │   │   ├── CompanyForm.tsx # Form for input data
-    │   │   ├── ImageGallery.tsx# Generated images display
-    │   │   └── Sidebar.tsx     # Console view with real-time progress
-    │   ├── hooks/
-    │   │   └── useImageGeneration.ts # Main generation logic
-    │   └── services/
-    │       └── api.ts          # API client with streaming support
-    └── package.json
+    ├── Dockerfile              # Frontend container configuration
+    ├── Makefile                # Frontend build automation
+    ├── package.json            # Node.js dependencies
+    ├── package-lock.json       # Dependency lock file
+    ├── bun.lockb               # Bun package manager lock
+    ├── components.json         # shadcn/ui configuration
+    ├── eslint.config.js        # ESLint configuration
+    ├── postcss.config.js       # PostCSS configuration
+    ├── index.html              # HTML entry point
+    ├── nginx.conf              # Production nginx configuration
+    ├── public/
+    │   ├── favicon.ico
+    │   ├── placeholder.svg
+    │   └── robots.txt
+    └── src/
+        ├── App.tsx             # Main application component
+        ├── App.css             # Global styles
+        ├── main.tsx            # React entry point
+        ├── index.css           # Base styles
+        ├── vite-env.d.ts       # TypeScript definitions
+        ├── components/
+        │   ├── CompanyForm.tsx # Form for input data
+        │   ├── ImageGallery.tsx# Generated images display
+        │   ├── Sidebar.tsx     # Console view with real-time progress
+        │   ├── AdPreview.tsx   # LinkedIn-style ad preview
+        │   ├── PromptViewer.tsx# Enhanced prompts display
+        │   └── ui/             # shadcn/ui components (49 components)
+        │       ├── button.tsx
+        │       ├── input.tsx
+        │       ├── textarea.tsx
+        │       └── ... (46 more UI components)
+        ├── hooks/
+        │   ├── useImageGeneration.ts # Main generation logic
+        │   ├── use-toast.ts    # Toast notifications
+        │   └── use-mobile.tsx  # Mobile detection
+        ├── pages/
+        │   ├── Index.tsx       # Main application page
+        │   └── NotFound.tsx    # 404 error page
+        └── services/
+            └── api.ts          # API client with streaming support
 ```
 
 ## Features
@@ -176,7 +226,7 @@ linkedin-ads/
 2. **In-memory Storage**: Prioritized development speed over persistence (production would use database)
 3. **Reference Images**: Local file system storage for MVP, cloud storage for production
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
-
+5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrified some commit history.
 
 ### Trade-offs Made
 1. **Streaming vs Simplicity**: Added complexity for better user experience
@@ -193,17 +243,19 @@ linkedin-ads/
 ### Current Limitations
 1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. A tweak to solve this for further iterations is to complement DALL-E with something like pillow to add those texts.
 2. **No persistent storage**: Images stored in memory only
-3. **No user authentication**: Open API without access controls  
+3. **Some steps take long**: Some steps take longer than others, which can lead to a bad user experience. Cache, token optimization, and parallelization are some solutions to this problem.
 4. **Local reference images**: Limited to pre-loaded examples
 5. **No image caching**: Each request generates fresh images
 6. **Rate limiting**: Basic OpenAI API limits only
+7. **Modification feature**: While we take the original image as input, DALL-E 3 will probably vary the image considerably due to it's own limitations.
+
 
 ## Future Enhancements
 
 1. **LinkedIn Campaign Manager Integration**: Use LinkedIn Campaign Manager to create and manage campaigns
-2. **User Authentication**: JWT-based auth system
-3. **Image Caching**: Redis for frequently requested image types
-4. **Background Processing**: Celery for async image generation
+2. **Caching**: Redis for frequently requested data
+3. **Background Processing**: Celery for async image generation
+4. **Add texts to images**: Use pillow to add high-contrast texts to images
 5. **Advanced Analytics**: LangSmith integration for prompt performance
 6. **Web Scraping**: Automated company information extraction
 7. **A/B Testing**: Multiple prompt strategies comparison
@@ -211,7 +263,7 @@ linkedin-ads/
 ## Review Focus Points
 
 1. **Real-time Architecture**: SSE streaming implementation and frontend state management
-2. **AI Integration**: LangGraph workflow design and GPT-4o prompt optimization
+2. **AI Integration**: Workflow design and GPT-4o prompt optimization
 3. **Component Design**: React component architecture and TypeScript usage
 4. **User Experience**: Sidebar console design and real-time progress feedback
 5. **Code Quality**: Clean separation of concerns and maintainable structure
@@ -240,6 +292,3 @@ linkedin-ads/
 - **Validation**: Pydantic
 - **Documentation**: FastAPI automatic OpenAPI docs
 
-## License
-
-This project is part of a coding challenge for Kalos.

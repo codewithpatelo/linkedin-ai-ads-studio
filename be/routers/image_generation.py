@@ -8,12 +8,10 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from models import (
-    GeneratedImage,
     ImageGenerationRequest,
     ImageGenerationResponse,
     ImageModificationRequest,
     ImageModificationResponse,
-    ImageStyle,
 )
 from services.image_service import image_service
 
