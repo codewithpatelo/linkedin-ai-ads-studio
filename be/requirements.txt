@@ -1,0 +1,25 @@
+# Core FastAPI dependencies
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+pydantic==2.10.4
+python-multipart==0.0.12
+
+# AI and LLM dependencies
+openai==1.97.1
+langchain==0.3.7
+langchain-openai==0.2.8
+langgraph==0.2.45
+langsmith==0.1.147
+
+# Utility dependencies
+python-dotenv==1.0.1
+httpx==0.28.1
+requests==2.31.0
+
+# Code quality tools
+black==24.10.0
+isort==5.13.2
+flake8==7.1.1
+mypy==1.13.0
+pytest==8.3.3
+pytest-asyncio==0.24.0
