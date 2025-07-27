@@ -40,8 +40,100 @@ async def generate_images_stream(request: ImageGenerationRequest):
             # Step 5: Generate Images
             yield f"data: {json.dumps({'type': 'progress', 'step': 'image_generation', 'message': 'Generating images with DALL-E 3...'})}\n\n"
 
-            # Generate images using the workflow with detailed progress
-            workflow_result = await image_service.generate_images_with_workflow(request)
+            # Execute workflow steps individually with real-time streaming
+            from services.image_service import WorkflowState
+            import uuid
+            
+            try:
+                # Create initial state
+                initial_state = WorkflowState(request=request)
+                current_state = initial_state
+                
+                # Step 1: Company Analysis
+                current_state = await image_service._analyze_company(current_state)
+                if current_state.error:
+                    raise Exception(f"Company analysis failed: {current_state.error}")
+                yield f"data: {json.dumps({'type': 'step_completed', 'step': 'company_analysis', 'message': '✅ Company analysis completed'})}
+
+"
+                
+                # Step 2: Load Reference Images
+                current_state = await image_service._load_reference_images(current_state)
+                if current_state.error:
+                    raise Exception(f"Reference loading failed: {current_state.error}")
+                yield f"data: {json.dumps({'type': 'step_completed', 'step': 'loading_references', 'message': '✅ Reference images loaded'})}
+
+"
+                
+                # Step 3: Generate Enhanced Prompts
+                current_state = await image_service._generate_enhanced_prompts(current_state)
+                if current_state.error:
+                    raise Exception(f"Prompt enhancement failed: {current_state.error}")
+                
+                # Send enhanced prompts with detailed console output
+                if current_state.enhanced_prompts:
+                    prompts_preview = "\n".join([f"Style {i+1}: {prompt[:100]}..." for i, prompt in enumerate(current_state.enhanced_prompts)])
+                    newline = "\n"
+                    message = f'✅ Enhanced prompts generated:{newline}{prompts_preview}'
+                    yield f"data: {json.dumps({'type': 'step_completed', 'step': 'prompt_enhancement', 'message': message})}
+
+"
+                    yield f"data: {json.dumps({'type': 'prompts_ready', 'prompts': current_state.enhanced_prompts, 'message': 'Enhanced prompts available'})}
+
+"
+                
+                # Step 4: Generate Ad Copy
+                current_state = await image_service._generate_ad_copy(current_state)
+                if current_state.error:
+                    raise Exception(f"Ad copy generation failed: {current_state.error}")
+                
+                # Send ad copy with detailed console output
+                if current_state.ad_copy:
+                    ad_copy = current_state.ad_copy
+                    newline = "\n"
+                    copy_preview = f"Headline: {ad_copy.get('headline', 'N/A')}{newline}Description: {ad_copy.get('description', 'N/A')[:80]}...{newline}CTA: {ad_copy.get('cta', 'N/A')}"
+                    message = f'✅ Ad copy generated:{newline}{copy_preview}'
+                    yield f"data: {json.dumps({'type': 'step_completed', 'step': 'copy_generation', 'message': message})}
+
+"
+                    yield f"data: {json.dumps({'type': 'copy_ready', 'ad_copy': current_state.ad_copy, 'message': 'Ad copy available'})}
+
+"
+                
+                # Step 5: Generate Images
+                current_state = await image_service._generate_images(current_state)
+                if current_state.error:
+                    raise Exception(f"Image generation failed: {current_state.error}")
+                
+                if not current_state.generated_images:
+                    raise Exception("No images were generated")
+                
+                # Store images with request ID
+                request_id = str(uuid.uuid4())
+                image_service.image_storage[request_id] = current_state.generated_images
+                for image in current_state.generated_images:
+                    image.request_id = request_id
+                
+                # Send image generation completion
+                image_count = len(current_state.generated_images)
+                yield f"data: {json.dumps({'type': 'step_completed', 'step': 'image_generation', 'message': f'✅ Generated {image_count} images successfully'})}
+
+"
+                
+                # Create workflow result
+                workflow_result = {
+                    "images": current_state.generated_images,
+                    "enhanced_prompts": current_state.enhanced_prompts,
+                    "ad_copy": current_state.ad_copy,
+                    "request_id": request_id,
+                }
+                
+            except Exception as workflow_error:
+                logger.error(f"Workflow step failed: {workflow_error}")
+                yield f"data: {json.dumps({'type': 'error', 'message': f'❌ {str(workflow_error)}'})}
+
+"
+                return
 
             if workflow_result and workflow_result.get("images"):
                 # Send step completion with results
