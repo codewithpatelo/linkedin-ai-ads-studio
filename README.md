@@ -128,7 +128,7 @@ linkedin-ads/
 - **Modern UI**: Clean, professional interface with shadcn/ui components
 - **Sidebar Console**: Terminal-style progress view with enhanced prompts display
 - **Real-time Updates**: Live streaming of generation steps and AI-enhanced prompts
-- **Image Gallery**: Professional display with download and modification options
+- **Image Gallery**: Professional display with modification options
 - **Form Validation**: Comprehensive input validation and error handling
 
 ### API Endpoints
@@ -162,7 +162,7 @@ linkedin-ads/
    - Frontend state management for real-time UI updates
 
 2. **AI-First Design**
-   - **Workflow-Based**: Multi-step AI pipeline (company analysis → reference loading → prompt enhancement → image generation)
+   - **Workflow-Based**: Multi-step AI pipeline (company analysis → reference loading → optimized prompt generation → image generation)
    - **GPT-4o Integration**: Advanced prompt optimization with context awareness
    - **Reference Image System**: Uses 3-5 LinkedIn ad examples to improve generation quality
    - **Fallback Mechanisms**: Graceful degradation when AI services are unavailable
@@ -226,13 +226,14 @@ linkedin-ads/
 2. **In-memory Storage**: Prioritized development speed over persistence (production would use database)
 3. **Reference Images**: Local file system storage for MVP, cloud storage for production
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
-5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrificed some commit history.
 
 ### Trade-offs Made
 1. **Streaming vs Simplicity**: Added complexity for better user experience
 2. **AI Enhancement vs Speed**: Slower generation for higher quality prompts
 3. **Console View vs Simple UI**: Developer-friendly interface over simplified design
 4. **Type Safety vs Development Speed**: Full TypeScript for maintainability
+5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrificed some commit history.
+
 
 ### Assumptions
 - Users have valid OpenAI API keys with DALL-E 3 access
