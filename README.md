@@ -1,10 +1,10 @@
-# LinkedIn Ads Image Generation Studio
+# AI-Powered LinkedIn Ads Image Generation Studio
 
 ![UX](gui.gif)
 
 An AI-powered image generation platform that creates professional LinkedIn advertisement images with real-time streaming progress, enhanced prompt generation, and professional ad copy enhancement.
 
-The UX is simple. User fills up a form with product name, company URL, targets audience and business values. The user have the option to specify the body text and footer text. Then, a fully-automated ad generation pipeline do the magic.
+The UX is simple. Users fill out a form with product name, company URL, target audience and business values. The user has the option to specify the body text and footer text. Then, a fully-automated ad generation pipeline does the magic.
 
 The pipeline is as follows:
 
@@ -22,7 +22,7 @@ At root level, just do:
 ```bash
 make setup
 ```
-Make sure to add .env file with OPEN AI API KEYS.
+Make sure to add .env file with OPENAI API KEYS.
 
 Then:
 
@@ -226,7 +226,7 @@ linkedin-ads/
 2. **In-memory Storage**: Prioritized development speed over persistence (production would use database)
 3. **Reference Images**: Local file system storage for MVP, cloud storage for production
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
-5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrified some commit history.
+5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrificed some commit history.
 
 ### Trade-offs Made
 1. **Streaming vs Simplicity**: Added complexity for better user experience
@@ -247,7 +247,7 @@ linkedin-ads/
 4. **Local reference images**: Limited to pre-loaded examples
 5. **No image caching**: Each request generates fresh images
 6. **Rate limiting**: Basic OpenAI API limits only
-7. **Modification feature**: While we take the original image as input, DALL-E 3 will probably vary the image considerably due to it's own limitations.
+7. **Modification feature**: While we take the original image as input, DALL-E 3 will probably vary the image considerably due to its own limitations.
 
 
 ## Future Enhancements
