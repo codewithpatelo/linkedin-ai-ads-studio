@@ -259,7 +259,7 @@ linkedin-ads/
 4. **Add texts to images**: Use pillow to add high-contrast texts to images
 5. **Advanced Analytics**: LangSmith integration for prompt performance
 6. **Web Scraping**: Automated company information extraction
-7. **A/B Testing**: Multiple prompt strategies comparison
+7. **A/B Testing**: Comparison and production of multiple prompt strategies, multiple CTAs, multiple body texts.
 
 ## Review Focus Points
 
