@@ -8,6 +8,7 @@ import { Building2, Target, Users, MessageSquare, ArrowRight } from "lucide-reac
 
 export interface CompanyFormData {
   companyUrl: string;
+  companyName?: string;
   productName: string;
   businessValue: string;
   audience: string;
@@ -202,6 +203,42 @@ export const CompanyForm = ({ onSubmit, isGenerating, progressMessage, currentSt
           </CardContent>
         </Card>
       </div>
+      
+      {/* Loading Overlay with Blurred Background */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+          <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-0 p-8 max-w-md mx-4">
+            <div className="text-center space-y-6">
+              <div className="relative">
+                <div className="w-16 h-16 mx-auto border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                <div className="absolute inset-0 w-16 h-16 mx-auto border-4 border-transparent border-r-blue-400 rounded-full animate-spin animate-reverse" style={{animationDuration: '1.5s'}} />
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="text-xl font-semibold text-gray-900">Generating LinkedIn Ads</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {progressMessage || 'Please wait while we create your personalized ads...'}
+                </p>
+                
+                {currentStep && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-200">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    <span className="text-sm font-medium text-blue-700 capitalize">
+                      {currentStep.replace('_', ' ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-center space-x-1">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}} />
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}} />
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

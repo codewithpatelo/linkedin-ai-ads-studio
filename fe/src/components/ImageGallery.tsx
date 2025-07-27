@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wand2, Download, RefreshCw, ArrowLeft, Sparkles } from "lucide-react";
+import { Wand2, Download, RefreshCw, ArrowLeft, Sparkles, Heart, MessageCircle, Repeat2, Send, MoreHorizontal } from "lucide-react";
 import { CompanyFormData } from "./CompanyForm";
+import { AdCopy } from "@/services/api";
 
 interface GeneratedImage {
   id: string;
@@ -17,14 +18,187 @@ interface GeneratedImage {
 interface ImageGalleryProps {
   companyData: CompanyFormData;
   images: GeneratedImage[];
+  adCopy: AdCopy | null;
   onBack: () => void;
   onRegenerateImage: (imageId: string, modificationPrompt: string) => void;
   isRegenerating: Record<string, boolean>;
 }
 
+interface LinkedInAdCardProps {
+  image: GeneratedImage;
+  companyData: CompanyFormData;
+  adCopy: AdCopy | null;
+  modificationPrompt: string;
+  onModificationChange: (prompt: string) => void;
+  onRegenerate: () => void;
+  onDownload: () => void;
+  isRegenerating: boolean;
+}
+
+const LinkedInAdCard = ({ 
+  image, 
+  companyData, 
+  adCopy, 
+  modificationPrompt, 
+  onModificationChange, 
+  onRegenerate, 
+  onDownload, 
+  isRegenerating 
+}: LinkedInAdCardProps) => {
+  // Company initial from company name with null check
+  const companyInitial = companyData?.companyName?.charAt(0)?.toUpperCase() || 'C';
+  
+  // Use adCopy if available, otherwise fallback to company data with null checks
+  const headline = adCopy?.headline || `Discover ${companyData?.productName || 'Our Product'}`;
+  const description = adCopy?.description || `${companyData?.businessValue || 'Amazing value'} for ${companyData?.audience || 'our customers'}`;
+  
+  return (
+    <Card className="bg-white shadow-lg border-0 overflow-hidden max-w-lg mx-auto">
+      <CardContent className="p-0">
+        {/* LinkedIn Post Header */}
+        <div className="p-4 flex items-center gap-3 border-b border-gray-100">
+          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+            {companyInitial}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 text-sm">{companyData?.companyName || 'Company Name'}</h3>
+              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 text-gray-600 border-gray-200">
+                Sponsored
+              </Badge>
+            </div>
+            <p className="text-xs text-gray-500">2.1M followers</p>
+          </div>
+          <Button variant="ghost" size="sm" className="p-1 h-auto">
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+          </Button>
+        </div>
+
+        {/* Ad Copy */}
+        <div className="p-4 pb-3">
+          <h4 className="font-semibold text-gray-900 text-sm mb-2 leading-tight">
+            {headline}
+          </h4>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {description}
+          </p>
+        </div>
+
+        {/* Generated Image */}
+        <div className="relative">
+          <img
+            src={image.url}
+            alt={`LinkedIn ad - ${image.style}`}
+            className="w-full aspect-[4/3] object-cover"
+          />
+          <div className="absolute top-3 right-3">
+            <Badge className="bg-black/70 text-white text-xs px-2 py-1">
+              {image.style}
+            </Badge>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="p-4 pt-3 border-b border-gray-100">
+          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-sm">
+            {companyData.footerText}
+          </Button>
+        </div>
+
+        {/* LinkedIn Engagement */}
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+            <div className="flex items-center gap-1">
+              <div className="flex -space-x-1">
+                <div className="w-4 h-4 bg-blue-600 rounded-full border border-white flex items-center justify-center">
+                  <Heart className="w-2 h-2 text-white fill-current" />
+                </div>
+                <div className="w-4 h-4 bg-green-600 rounded-full border border-white" />
+              </div>
+              <span className="ml-1">847</span>
+            </div>
+            <div className="flex gap-3">
+              <span>23 comments</span>
+              <span>156 reposts</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+            <Button variant="ghost" size="sm" className="flex-1 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 py-2">
+              <Heart className="w-4 h-4" />
+              <span className="text-sm font-medium">Like</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex-1 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 py-2">
+              <MessageCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Comment</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex-1 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 py-2">
+              <Repeat2 className="w-4 h-4" />
+              <span className="text-sm font-medium">Repost</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="flex-1 flex items-center justify-center gap-2 text-gray-600 hover:bg-gray-50 py-2">
+              <Send className="w-4 h-4" />
+              <span className="text-sm font-medium">Send</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Modification Controls */}
+        <div className="p-4 bg-gray-50 border-t border-gray-100">
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor={`modify-${image.id}`} className="text-sm font-medium text-gray-700">
+                Modify this ad
+              </Label>
+              <Input
+                id={`modify-${image.id}`}
+                placeholder="e.g., make it more colorful, change to dark theme..."
+                value={modificationPrompt}
+                onChange={(e) => onModificationChange(e.target.value)}
+                className="text-sm"
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={onRegenerate}
+                disabled={isRegenerating || !modificationPrompt.trim()}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                {isRegenerating ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-foreground border-t-transparent rounded-full animate-spin mr-2" />
+                    Modifying...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-3 h-3 mr-2" />
+                    Modify
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={onDownload}
+                variant="outline"
+                size="sm"
+                className="px-3"
+              >
+                <Download className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const ImageGallery = ({ 
   companyData, 
   images, 
+  adCopy,
   onBack, 
   onRegenerateImage, 
   isRegenerating 
@@ -104,76 +278,25 @@ export const ImageGallery = ({
           </CardContent>
         </Card>
 
-        {/* Images Grid */}
+        {/* LinkedIn Ads Grid */}
         <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
           {images.map((image, index) => (
-            <Card 
-              key={image.id} 
-              className="bg-gradient-card shadow-card border-0 overflow-hidden hover-lift animate-scale-in"
+            <div 
+              key={image.id}
+              className="animate-scale-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <CardContent className="p-0">
-                {/* Image */}
-                <div className="relative aspect-square bg-muted group">
-                  <img
-                    src={image.url}
-                    alt={`LinkedIn ad - ${image.style}`}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <Badge variant="secondary" className="bg-background/90 text-foreground">
-                      {image.style}
-                    </Badge>
-                  </div>
-                  <div className="absolute top-3 right-3">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleDownload(image.url, image.id)}
-                      className="bg-background/90 hover:bg-background"
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Modification Controls */}
-                <div className="p-4 space-y-3">
-                  <div className="space-y-2">
-                    <Label htmlFor={`modify-${image.id}`} className="text-sm font-medium">
-                      Modify this ad
-                    </Label>
-                    <Input
-                      id={`modify-${image.id}`}
-                      placeholder="e.g., make it more colorful, change to dark theme, add tech elements..."
-                      value={modificationPrompts[image.id] || ""}
-                      onChange={(e) => handleModificationChange(image.id, e.target.value)}
-                      className="text-sm input-focus"
-                    />
-                  </div>
-                  
-                  <Button
-                    onClick={() => handleRegenerate(image.id)}
-                    disabled={isRegenerating[image.id]}
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    {isRegenerating[image.id] ? (
-                      <>
-                        <div className="w-3 h-3 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
-                        Regenerating...
-                      </>
-                    ) : (
-                      <>
-                        <Wand2 className="w-3 h-3" />
-                        Regenerate
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              <LinkedInAdCard
+                image={image}
+                companyData={companyData}
+                adCopy={adCopy}
+                modificationPrompt={modificationPrompts[image.id] || ""}
+                onModificationChange={(prompt) => handleModificationChange(image.id, prompt)}
+                onRegenerate={() => handleRegenerate(image.id)}
+                onDownload={() => handleDownload(image.url, image.id)}
+                isRegenerating={isRegenerating[image.id] || false}
+              />
+            </div>
           ))}
         </div>
 

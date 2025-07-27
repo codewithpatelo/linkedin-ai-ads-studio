@@ -446,17 +446,13 @@ class ImageGenerationService:
         try:
             if not self.openai_client:
                 # Return placeholder when no API key
-                logger.warning(f"🚫 No OpenAI client configured - returning placeholder for {style.value}")
                 return GeneratedImage(
                     id=str(uuid.uuid4()),
-                    url=f"https://via.placeholder.com/1024x1024?text=No+API+Key+{style.value.title()}",
+                    url=f"https://via.placeholder.com/1024x1024?text=Modified+{style.value.title()}",
                     style=style,
                     prompt_used=prompt,
                     generation_timestamp=datetime.now().isoformat(),
                 )
-            
-            logger.info(f"🎨 Generating {style.value} image with DALL-E 3...")
-            logger.info(f"📝 Prompt: {prompt[:100]}...")
 
             response = await self.openai_client.images.generate(
                 model="dall-e-3",
@@ -465,8 +461,6 @@ class ImageGenerationService:
                 quality="standard",
                 n=1,
             )
-            
-            logger.info(f"✅ DALL-E 3 generated image successfully: {response.data[0].url[:50]}...")
 
             return GeneratedImage(
                 id=str(uuid.uuid4()),
@@ -553,7 +547,7 @@ class ImageGenerationService:
             current_state = await self._analyze_company(current_state)
             if current_state.error:
                 raise Exception(f"Company analysis failed: {current_state.error}")
-
+            
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -576,7 +570,7 @@ class ImageGenerationService:
             current_state = await self._load_reference_images(current_state)
             if current_state.error:
                 raise Exception(f"Reference loading failed: {current_state.error}")
-
+            
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -599,7 +593,7 @@ class ImageGenerationService:
             current_state = await self._enhance_prompts(current_state)
             if current_state.error:
                 raise Exception(f"Prompt enhancement failed: {current_state.error}")
-
+            
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -623,7 +617,7 @@ class ImageGenerationService:
             current_state = await self._generate_ad_copy(current_state)
             if current_state.error:
                 raise Exception(f"Ad copy generation failed: {current_state.error}")
-
+            
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -695,7 +689,7 @@ class ImageGenerationService:
                 self.image_storage[request_id] = images
                 for image in images:
                     image.request_id = request_id
-
+                
                 if event_stream_callback:
                     await event_stream_callback(
                         {

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { CompanyForm, CompanyFormData } from '@/components/CompanyForm';
 import { ImageGallery } from '@/components/ImageGallery';
-import { Sidebar } from '@/components/Sidebar';
+
 import { useImageGeneration } from '@/hooks/useImageGeneration';
 import { toast } from 'sonner';
+import { Sidebar } from '@/components/Sidebar';
+
 
 type AppState = "form" | "gallery";
 
@@ -20,6 +22,8 @@ const Index = () => {
     currentStep,
     enhancedPrompts,
     adCopy,
+    showPrompts,
+    setShowPrompts,
     consoleMessages,
     generateImages, 
     regenerateImage 
@@ -75,6 +79,7 @@ const Index = () => {
           <ImageGallery
             companyData={companyData}
             images={images}
+            adCopy={adCopy}
             onBack={handleBackToForm}
             onRegenerateImage={handleRegenerateImage}
             isRegenerating={isRegenerating}
@@ -91,6 +96,8 @@ const Index = () => {
           adCopy={adCopy}
           isGenerating={isGenerating}
           consoleMessages={consoleMessages}
+          showPrompts={showPrompts}
+          setShowPrompts={setShowPrompts}
         />
       </div>
     );
@@ -115,6 +122,8 @@ const Index = () => {
         adCopy={adCopy}
         isGenerating={isGenerating}
         consoleMessages={consoleMessages}
+        showPrompts={showPrompts}
+        setShowPrompts={setShowPrompts}
       />
     </>
   );
