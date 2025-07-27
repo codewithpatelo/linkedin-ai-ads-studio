@@ -51,6 +51,7 @@ const LinkedInAdCard = ({
   // Use adCopy if available, otherwise fallback to company data with null checks
   const headline = adCopy?.headline || `Discover ${companyData?.productName || 'Our Product'}`;
   const description = adCopy?.description || `${companyData?.businessValue || 'Amazing value'} for ${companyData?.audience || 'our customers'}`;
+  const ctaText = adCopy?.cta || companyData?.footerText || 'Learn More';
   
   return (
     <Card className="bg-white shadow-lg border-0 overflow-hidden max-w-lg mx-auto">
@@ -101,7 +102,7 @@ const LinkedInAdCard = ({
         {/* CTA Section */}
         <div className="p-4 pt-3 border-b border-gray-100">
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-sm">
-            {companyData.footerText}
+            {ctaText}
           </Button>
         </div>
 

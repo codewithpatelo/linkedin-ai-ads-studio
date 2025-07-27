@@ -1,5 +1,7 @@
 # LinkedIn Ads Image Generation Studio
 
+![alt text](image.png)
+
 An AI-powered image generation platform that creates professional LinkedIn advertisement images with real-time streaming progress, enhanced prompt generation, and professional ad copy creation.
 
 ## Quick Setup

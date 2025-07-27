@@ -219,32 +219,37 @@ class ImageGenerationWorkflow:
 
         prompts = {}
 
-        # Enhanced style-specific templates based on SpeedWork Social best practices
+        # Enhanced style-specific templates for LinkedIn ads with simple backgrounds
         style_templates = {
             "professional": {
-                "visual_approach": "Clean, executive-level design with thought leadership positioning",
-                "composition": "Minimal text overlay (max 30%), high contrast background, professional photography style",
-                "elements": "Corporate icons, data visualization, professional headshots or office environments",
+                "visual_approach": "Professional business person on clean, simple background",
+                "composition": "Person positioned prominently with solid color or subtle gradient background",
+                "elements": "Business professional in suit, confident pose, minimal background distractions",
+                "background": "Clean white, light gray, or subtle blue gradient background",
             },
             "modern": {
-                "visual_approach": "Tech-forward design with innovation emphasis and sleek aesthetics",
-                "composition": "Bold geometric shapes, gradient backgrounds, modern typography hierarchy",
-                "elements": "Digital interfaces, growth charts, modern workspace imagery",
+                "visual_approach": "Modern professional with tech-forward styling",
+                "composition": "Contemporary business person against sleek, minimalist backdrop",
+                "elements": "Modern dressed professional, clean lines, tech-savvy appearance",
+                "background": "Solid modern colors like navy, teal, or clean geometric patterns",
             },
             "creative": {
-                "visual_approach": "Artistic visual metaphors balanced with B2B credibility",
-                "composition": "Creative layouts with strategic text placement, vibrant but professional colors",
-                "elements": "Conceptual imagery, creative typography, artistic representations of business concepts",
+                "visual_approach": "Creative professional with artistic but business-appropriate styling",
+                "composition": "Person with creative energy against simple, colorful background",
+                "elements": "Creative professional, expressive but professional, approachable demeanor",
+                "background": "Simple vibrant colors or subtle artistic patterns, not overwhelming",
             },
             "minimalist": {
-                "visual_approach": "Clean, focused mobile-optimized design with maximum impact",
-                "composition": "Lots of white space, single focal point, minimal text (max 20%)",
-                "elements": "Simple icons, clean typography, single powerful visual element",
+                "visual_approach": "Clean, focused portrait with maximum simplicity",
+                "composition": "Single person, lots of negative space, ultra-clean composition",
+                "elements": "Professional headshot or upper body, simple clothing, clear focus",
+                "background": "Pure white, light gray, or single solid color - absolutely minimal",
             },
             "bold": {
-                "visual_approach": "High-impact imagery with compelling data visualization",
-                "composition": "Strong contrast, bold typography, attention-grabbing visual hierarchy",
-                "elements": "Statistics callouts, bold graphics, dynamic compositions",
+                "visual_approach": "Confident professional with strong visual impact",
+                "composition": "Dynamic pose or expression against high-contrast simple background",
+                "elements": "Confident business person, strong presence, professional attire",
+                "background": "Bold solid colors like deep blue, black, or strong contrast backgrounds",
             },
         }
 
@@ -266,67 +271,53 @@ class ImageGenerationWorkflow:
                     "visual_approach",
                     "composition",
                     "elements",
+                    "background",
                 ],
-                template="""
-                Act as a LinkedIn advertising and prompt engineering expert. Create a high-converting DALL-E prompt for a B2B LinkedIn ad that follows proven performance frameworks:
-                
-                **Campaign Details:**
-                Style: {style}
-                Company: {company_url}
-                Product: {product_name}
-                Value Proposition: {business_value}
-                Target Audience: {audience}
-                Ad Copy: {body_text}
-                CTA: {footer_text}
-                
-                **Company Intelligence:** {analysis}
-                
-                **Style Guidelines:**
-                Visual Approach: {visual_approach}
-                Composition: {composition}
-                Key Elements: {elements}
-                
-                **LinkedIn Ad Performance Rules (CRITICAL):**
-                
-                1. **Visual Hierarchy & Text Limits:**
-                   - Limit text to maximum 50% of image space (preferably 20-30%)
-                   - Use bold, readable fonts that work on mobile
-                   - Ensure high contrast between text and background
-                   - Create clear visual flow toward the CTA
-                
-                2. **Thumb-Stopping Appeal:**
-                   - Design for 1-2 second attention capture
-                   - Use eye-catching but relevant visuals
-                   - Incorporate movement or dynamic elements
-                   - Ensure mobile-first optimization
-                
-                3. **Professional B2B Standards:**
-                   - Maintain credibility and trust signals
-                   - Use industry-appropriate imagery
-                   - Include subtle brand elements
-                   - Avoid overly promotional appearance
-                
-                4. **Technical Specifications:**
-                   - Square format (1:1 ratio) optimized for LinkedIn feed
-                   - High resolution and crisp details
-                   - Professional color palette
-                   - Consistent branding elements
-                
-                **Content Framework (AIDA Structure):**
-                - **Attention:** Hook element that grabs immediate focus
-                - **Interest:** Visual representation of the value proposition
-                - **Desire:** Outcome visualization or benefit illustration
-                - **Action:** Clear, compelling CTA placement
-                
-                **Required Visual Elements:**
-                - Main focal point that represents the core benefit
-                - Supporting graphics or icons that enhance understanding
-                - Professional color scheme aligned with brand
-                - Clear typography hierarchy
-                - Strategic white space usage
-                - Mobile-optimized text size and placement
-                
-                Generate a detailed, specific DALL-E prompt that will create a high-performing LinkedIn ad image following these proven frameworks and best practices.
+                template="""Create a professional LinkedIn ad image with the following specifications:
+
+**Core Concept:**
+{visual_approach}
+{composition}
+{elements}
+
+**Background:** {background}
+
+**Target Audience:** {audience} for {product_name}
+**Business Value:** {business_value}
+
+**DALL-E Prompt Requirements:**
+
+1. **Main Subject:** Professional business person representing the target audience ({audience})
+   - Confident, approachable expression
+   - Professional business attire appropriate for the industry
+   - Diverse representation (vary ethnicity, age, gender across styles)
+   - Upper body or headshot composition
+
+2. **Background:** {background}
+   - Keep background simple and non-distracting
+   - Ensure high contrast with the person for text overlay
+   - No complex patterns, busy offices, or detailed environments
+   - Solid colors, subtle gradients, or minimal geometric elements only
+
+3. **Style Execution:** {style} style
+   - {visual_approach}
+   - {composition}
+   - {elements}
+
+4. **Technical Specifications:**
+   - Square format (1:1 aspect ratio) for LinkedIn feed
+   - High resolution, professional photography quality
+   - Studio lighting with soft shadows
+   - Sharp focus on the person, slightly blurred background if needed
+   - Leave 30% of image space clear for text overlay
+
+5. **LinkedIn Ad Optimization:**
+   - Design for mobile viewing (clear at small sizes)
+   - Professional B2B credibility
+   - Thumb-stopping appeal without being overly flashy
+   - Appropriate for {audience} in {product_name} context
+
+Generate a concise DALL-E prompt (max 300 words) that creates a professional LinkedIn ad image with a business person on a simple background, optimized for {style} style and {audience} targeting.
                 """,
             )
 
@@ -342,6 +333,7 @@ class ImageGenerationWorkflow:
                 visual_approach=style_config["visual_approach"],
                 composition=style_config["composition"],
                 elements=style_config["elements"],
+                background=style_config["background"],
             )
 
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
@@ -446,6 +438,9 @@ class ImageGenerationWorkflow:
         # Initialize OpenAI client
         client = AsyncOpenAI()
         generated_images = []
+        
+        # Generate request_id for this batch
+        request_id = str(uuid.uuid4())
 
         # Generate images for each style
         styles = [
@@ -456,14 +451,23 @@ class ImageGenerationWorkflow:
             ImageStyle.BOLD,
         ]
 
+        # Get ad copy for CTA integration
+        ad_copy = state.get("ad_copy", {})
+        cta_text = ad_copy.get("cta", "Learn More")
+        headline = ad_copy.get("headline", f"Discover {request.product_name}")
+        
         for i, style in enumerate(styles):
             try:
-                # Use enhanced prompt if available, otherwise use fallback
-                if i < len(enhanced_prompts):
-                    prompt = enhanced_prompts[i]
+                # Use enhanced prompt for each style with CTA integration
+                style_key = style.value.lower()
+                base_prompt = enhanced_prompts.get(style_key, "")
+                
+                if base_prompt:
+                    # Integrate CTA text into the enhanced prompt
+                    prompt = f"{base_prompt} IMPORTANT: Include visible text overlay with CTA button showing '{cta_text}' in high contrast colors. The CTA should be prominently displayed and easily readable. Also include headline text '{headline}' in a professional font. Ensure text has 4.5:1 contrast ratio for accessibility."
                 else:
-                    # Fallback prompt
-                    prompt = f"Professional LinkedIn ad image for {request.product_name}, {style.value} style, high quality, business professional"
+                    # Enhanced fallback with CTA
+                    prompt = f"Professional LinkedIn ad image for {request.product_name}, {style.value} style. Include prominent CTA button with text '{cta_text}' and headline '{headline}'. High contrast text overlay, business professional, high quality, 4.5:1 contrast ratio, mobile-optimized design."
 
                 # Generate image with DALL-E 3
                 response = await client.images.generate(
@@ -480,7 +484,7 @@ class ImageGenerationWorkflow:
                     url=response.data[0].url,
                     style=style,
                     prompt_used=prompt,
-                    request_id="",  # Will be set later
+                    request_id=request_id,
                     company_url=request.company_url,
                     product_name=request.product_name,
                     business_value=request.business_value,
@@ -497,7 +501,7 @@ class ImageGenerationWorkflow:
                     url="https://via.placeholder.com/1024x1024/4A90E2/FFFFFF?text=LinkedIn+Ad",
                     style=style,
                     prompt_used=f"Placeholder for {style.value} style",
-                    request_id="",
+                    request_id=request_id,
                     company_url=request.company_url,
                     product_name=request.product_name,
                     business_value=request.business_value,

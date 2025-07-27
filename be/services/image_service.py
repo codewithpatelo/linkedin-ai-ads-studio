@@ -153,56 +153,84 @@ class ImageGenerationService:
                     continue
 
                 style_prompt = f"""
-            You are an expert LinkedIn advertising specialist and prompt engineer. Create an enhanced DALL-E 3 prompt for generating high-converting B2B LinkedIn ad images.
+        Create a highly-optimized DALL-E 3 prompt for a LinkedIn ad image with people on a simple background and a CTA text with high-contrass background.
+        
+        Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES + CTA OPTIMIZATION
 
-            **Complete Context Information:**
-            Company Analysis: {state.company_analysis or 'Professional business environment'}
-            Product/Service: {state.request.product_name}
-            Business Value Proposition: {state.request.business_value}
-            Target Audience: {state.request.audience}
-            Body Text Context: {state.request.body_text or 'Professional business messaging'}
-            Footer Text: {state.request.footer_text or 'Call-to-action messaging'}
-            Target Style: {style.value}
-            Reference Images Context: {len(state.reference_images)} professional LinkedIn ad references loaded
+        **Context:**
+        - Product/Service: {state.request.product_name}
+        - Target Audience: {state.request.audience}
+        - Business Value: {state.request.business_value}
+        - Style: {style.value}
 
-            Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES + CTA OPTIMIZATION
+        **Style Guide:** {self._get_style_description(style)}
 
-            **Required Elements (Must Include ALL):**
-            1. **Clear Action Verb**: Start with "Create a photorealistic image of..." or "Generate a professional scene showing..."
-            2. **Specific Subject**: Name exact people/objects related to {state.request.product_name} and {state.request.audience}
-            3. **Rich Context**: Detailed environment that reflects the company analysis and business value
-            4. **Technical Photography**: Include "shot on Canon 5D with 50mm lens, studio lighting, shallow depth of field"
-            5. **Audience Empathy**: Diverse, authentic professionals representing {state.request.audience} 
-            6. **B2B Credibility**: Thought leadership positioning, expertise signals related to {state.request.business_value}
-            7. **Data Elements**: Charts, dashboards, metrics, statistics that visualize the business value proposition
-            8. **Emotional Tone**: Specify mood that aligns with the target audience and business context
-            9. **CTA Optimization**: High contrast areas specifically designed for text overlay of "{state.request.footer_text or 'Learn More'}"
-            10. **Color Contrast**: Specify background colors that provide high contrast for white/dark text overlay
-            11. **Mobile Optimization**: Clear visual hierarchy optimized for 1200x1200px LinkedIn format
-            12. **Thumb-Stopping Appeal**: Attention-grabbing elements balanced with B2B professionalism
-            13. **Brand Context**: Visual elements that reflect the company's industry and professional context
-            14. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
+        **DALL-E Prompt Requirements:**
 
-            **Style Specifications**: {self._get_style_description(style)}
+        1. **Main Subject:** Professional business people representing {state.request.audience}
+           - Confident, approachable expression
+           - Professional business attire appropriate for the industry
+           - Diverse representation (vary ethnicity, age, gender)
+           - Upper body or headshot composition
+           - People should embody the target audience for {state.request.product_name}
 
-            **Critical Technical Requirements**:
-            - Photorealistic quality with professional photography specifications
-            - LinkedIn-optimized composition (1:1 aspect ratio preferred)
-            - HIGH CONTRAST backgrounds (light backgrounds for dark text, dark backgrounds for light text)
-            - Professional lighting (studio quality, natural daylight, warm professional tones)
-            - Brand-aligned color palette that supports text readability
-            - Mobile-first design with clear focal points
-            - Space allocation for CTA text overlay in high-contrast areas
-            - Visual hierarchy that guides eye to CTA placement areas
+        2. **Background:** Simple and clean - NO complex environments
+           - Solid colors, subtle gradients, or minimal geometric elements ONLY
+           - High contrast with the person for text overlay
+           - NO offices, NO detailed environments, NO busy patterns
+           - Choose background color that complements the {style.value} style
 
-            **CTA Integration Requirements**:
-            - Reserve 20-30% of image space for text overlay placement
-            - Ensure background contrast ratio of at least 4.5:1 for accessibility
-            - Consider CTA text: "{state.request.footer_text or 'Learn More'}" when designing contrast areas
-            - Include visual elements that naturally frame or highlight CTA placement
+        3. **Technical Specs:**
+           - Square format (1:1 aspect ratio) for LinkedIn feed
+           - Professional photography quality (shot on Canon 5D, studio lighting)
+           - Sharp focus on person, slightly blurred background if needed
+           - Leave 30% of image space clear for text overlay
+           - High contrast between person and background
 
-            Generate a single, extremely detailed and comprehensive prompt (300-400 words) that incorporates ALL context information and optimizes for maximum LinkedIn B2B engagement and conversion.
-            """
+        4. **LinkedIn Optimization:**
+           - Design for mobile viewing (clear at small sizes)
+           - Professional B2B credibility
+           - Thumb-stopping appeal without being flashy
+           - Appropriate for {state.request.audience} in {state.request.product_name} context
+
+        The prompt should be concise (max 250 words) with the goal to create a professional LinkedIn ad image with:
+        - A business person representing {state.request.audience}
+        - Simple, clean background (no complex environments)
+        - {style.value} style execution
+        - High contrast for text overlay
+        - Professional B2B appeal
+        
+        **Critical Technical Requirements**:
+        - Photorealistic quality with simple background and CTA texts should contrass that background.
+        - LinkedIn-optimized composition (1:1 aspect ratio preferred)
+        - HIGH CONTRAST backgrounds (light backgrounds for dark text, dark backgrounds for light text)
+        - Professional lighting for people on the image (studio quality, natural daylight, warm professional tones)
+        - Brand-aligned color palette that supports text readability
+        - Mobile-first design with clear focal points
+        - Space allocation for CTA text overlay in high-contrast areas
+        - Visual hierarchy that guides eye to CTA placement areas
+
+        **CTA Integration Requirements**:
+        - Reserve 20-30% of image space for text overlay placement
+        - Ensure background contrast ratio of at least 4.5:1 for accessibility
+        - Consider CTA text: "{state.request.footer_text or 'Learn More'}" when designing contrast areas
+        - Include visual elements that naturally frame or highlight CTA placement
+        
+        **Required Elements (Must Include ALL):**
+        1. **Clear Action Verb**: Start with "Create LinkedIn Ad image of..." or "Generate a professional LinkedIn Ad scene showing..."
+        2. **Specific Subject**: Name exact people/objects related to {state.request.product_name} and {state.request.audience}
+        3. **Rich Context**: Detailed environment that reflects the company analysis and business value
+        4. **Technical Photography**: Include "shot on Canon 5D with 50mm lens, studio lighting, shallow depth of field for pictures portraited in the image"
+        5. **Audience Empathy**: Diverse, authentic professionals representing {state.request.audience} 
+        6. **B2B Credibility**: Thought leadership positioning, expertise signals related to {state.request.business_value}
+        7. **Emotional Tone**: Specify mood that aligns with the target audience and business context
+        8. **CTA Optimization**: High contrast areas specifically designed for text overlay of "{state.request.footer_text or 'Learn More'}"
+        9. **Color Contrast**: Specify background colors that provide high contrast for white/dark text overlay.
+        10. **Mobile Optimization**: Clear visual hierarchy optimized for 1200x1200px LinkedIn format
+        11. **Thumb-Stopping Appeal**: Attention-grabbing elements balanced with B2B professionalism
+        12. **Brand Context**: Visual elements that reflect the company's industry and professional context
+        13. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
+        """
 
                 response = await self.llm.ainvoke([HumanMessage(content=style_prompt)])
                 prompts.append(response.content.strip())
@@ -484,11 +512,11 @@ class ImageGenerationService:
     def _get_style_description(self, style: ImageStyle) -> str:
         """Get detailed description for each image style optimized for LinkedIn ads."""
         style_descriptions = {
-            ImageStyle.PROFESSIONAL: """Photorealistic corporate imagery with executive-level appeal. Include: business professionals in modern office settings, clean composition with space for statistics/data overlay, warm studio lighting, diverse representation, branded color palette, thought leadership positioning. Technical specs: shot on Canon 5D with 50mm lens, shallow depth of field, high contrast for text readability. Emphasize trustworthiness, expertise, and B2B credibility through professional attire, confident expressions, and premium office environments.""",
-            ImageStyle.MODERN: """Contemporary tech-forward design with innovative appeal. Include: sleek office environments, multiple monitors displaying dashboards/code, standing desks, collaborative spaces, data visualization elements, bright natural lighting from large windows. Technical specs: crisp 4K quality, clean lines, modern color schemes (blues, grays, whites), mobile-optimized composition. Show diverse professionals using cutting-edge technology, emphasizing innovation, efficiency, and digital transformation.""",
-            ImageStyle.CREATIVE: """Artistic yet professional imagery with thumb-stopping visual appeal. Include: creative visual metaphors (circuit board cityscapes, network connections, growth charts as landscapes), dynamic compositions, engaging eye contact, unique perspectives while maintaining B2B credibility. Use compelling lighting (golden hour, dramatic shadows), rich textures, and attention-grabbing elements. Balance creativity with professional context - conference rooms, brainstorming sessions, innovative workspaces.""",
-            ImageStyle.MINIMALIST: """Clean, focused design optimized for mobile LinkedIn viewing. Include: simple compositions with clear focal points, high contrast backgrounds for text overlay, minimal color palette (2-3 colors max), plenty of white space, single subject or small group focus. Technical specs: sharp focus, clean lines, professional lighting. Emphasize clarity, simplicity, and direct messaging - perfect for data-driven content, testimonials, or clear value propositions.""",
-            ImageStyle.BOLD: """High-impact imagery with statistics and compelling data visualization. Include: large numbers/percentages prominently displayed, charts and graphs integrated naturally, confident professionals presenting data, vibrant but professional color schemes, dynamic compositions with strong visual hierarchy. Technical specs: high contrast, bold typography areas, energetic lighting. Show measurable results, ROI demonstrations, performance metrics, and success stories with authentic professional celebration or achievement moments.""",
+            ImageStyle.PROFESSIONAL: """Professional business person on clean, simple background. Show: confident business professional in suit or professional attire, positioned prominently in frame, warm studio lighting, diverse representation. Background: solid white, light gray, or subtle blue gradient - NO office environments, NO complex backgrounds. Technical specs: shot on Canon 5D with 50mm lens, shallow depth of field focusing on person, high contrast between person and background for text overlay. Person should have confident, approachable expression with professional credibility.""",
+            ImageStyle.MODERN: """Modern professional with tech-forward styling on minimalist backdrop. Show: contemporary business person in modern professional attire, clean lines, tech-savvy appearance. Background: solid modern colors like navy blue, teal, or clean geometric pattern - AVOID complex office environments. Technical specs: crisp quality, modern color schemes, mobile-optimized composition. Focus on single person with contemporary, innovative look against simple background.""",
+            ImageStyle.CREATIVE: """Creative professional with artistic but business-appropriate styling. Show: expressive but professional person with creative energy, approachable demeanor, engaging eye contact. Background: simple vibrant colors or subtle artistic patterns - NOT overwhelming, NO complex environments. Use compelling lighting and rich textures on the person while keeping background minimal. Balance creativity with professional credibility through clean composition.""",
+            ImageStyle.MINIMALIST: """Ultra-clean portrait with maximum simplicity. Show: single professional person, headshot or upper body, simple clothing, clear focus on person. Background: pure white, light gray, or single solid color - absolutely minimal, NO patterns or distractions. Technical specs: sharp focus on person, clean lines, professional lighting. Emphasize clarity and simplicity with lots of negative space around the person.""",
+            ImageStyle.BOLD: """Confident professional with strong visual impact on high-contrast background. Show: dynamic business person with confident presence, strong expression, professional attire. Background: bold solid colors like deep blue, black, or strong contrast colors - NO complex elements. Technical specs: high contrast between person and background, energetic lighting on person. Focus on single confident professional against simple, bold background.""",
         }
         return style_descriptions.get(
             style, "Professional business style optimized for LinkedIn engagement"
@@ -685,10 +713,13 @@ class ImageGenerationService:
 
             # Store images with request ID
             if images:
-                request_id = str(uuid.uuid4())
+                # Use the request_id from the first image (set by workflow)
+                request_id = images[0].request_id if images[0].request_id else str(uuid.uuid4())
                 self.image_storage[request_id] = images
+                # Ensure all images have the same request_id
                 for image in images:
-                    image.request_id = request_id
+                    if not image.request_id:
+                        image.request_id = request_id
                 
                 if event_stream_callback:
                     await event_stream_callback(
@@ -767,10 +798,15 @@ class ImageGenerationService:
     async def modify_image(self, request: ImageModificationRequest) -> GeneratedImage:
         """Modify an existing image based on user feedback."""
         try:
+            logger.info(f"Modifying image {request.original_image_id} with prompt: {request.modification_prompt}")
+            logger.info(f"Available images in storage: {list(self.image_storage.keys())}")
+            
             # Find the original image
             original_image = None
-            for images in self.image_storage.values():
+            for request_id, images in self.image_storage.items():
+                logger.info(f"Checking request_id {request_id} with {len(images)} images")
                 for img in images:
+                    logger.info(f"Checking image ID: {img.id}")
                     if img.id == request.original_image_id:
                         original_image = img
                         break
@@ -778,6 +814,7 @@ class ImageGenerationService:
                     break
 
             if not original_image:
+                logger.error(f"Original image {request.original_image_id} not found in storage")
                 raise ValueError(
                     f"Original image {request.original_image_id} not found"
                 )
@@ -853,11 +890,11 @@ Apply the requested modifications while strengthening these proven B2B engagemen
         base_context = f"professional {request.product_name} for {request.audience}"
 
         fallback_prompts = {
-            ImageStyle.PROFESSIONAL: f"""Create a photorealistic image of a confident business executive (diverse representation) leading a meeting in a bright modern conference room, shot on Canon 5D with 50mm lens, warm studio lighting, multiple professionals around a table reviewing charts on a large screen, branded notebooks visible, professional attire, optimistic collaborative mood, high contrast background for text overlay, corporate color palette, space for statistics display, thought leadership positioning, 1200x1200px, LinkedIn B2B optimized. Context: {base_context}""",
-            ImageStyle.MODERN: f"""Generate a contemporary image of diverse software developers at standing desks with multiple monitors displaying code and dashboards, bright natural light from floor-to-ceiling windows, sleek tech office environment, clean minimalist design, 4K crisp quality, mobile-optimized composition, innovative atmosphere, collaborative workspace, branded company materials, space for data visualization overlay, modern color scheme (blues, whites, grays), professional yet approachable, LinkedIn tech audience focused. Context: {base_context}""",
-            ImageStyle.CREATIVE: f"""Design an artistic image of a futuristic office meeting where holographic charts and data float above a conference table, diverse business professionals pointing at 3D data visualizations, dramatic lighting with blue tech glows, metaphorical representation of digital transformation, photorealistic but visually striking, professional attire, confident expressions, innovative workspace, attention-grabbing composition while maintaining B2B credibility, space for compelling statistics, thumb-stopping visual appeal for LinkedIn feeds. Context: {base_context}""",
-            ImageStyle.MINIMALIST: f"""Create a clean, focused image of a single business professional (diverse representation) presenting a simple, elegant chart on a whiteboard in a bright, minimal conference room, shot with shallow depth of field, high contrast white background, professional lighting, clear focal point, plenty of negative space for text overlay, simple color palette (2 colors max), mobile-optimized composition, direct eye contact with camera, confident expression, LinkedIn mobile viewing optimized. Context: {base_context}""",
-            ImageStyle.BOLD: f"""Generate a high-impact image of celebrating business professionals (diverse team) in front of a large display showing impressive growth metrics and ROI numbers, vibrant but professional lighting, dynamic composition with upward trending arrows and percentage symbols prominently featured, confident expressions, modern office setting, branded materials, energetic atmosphere, space for large statistics overlay, attention-grabbing visual hierarchy, professional celebration of measurable success, LinkedIn B2B engagement optimized. Context: {base_context}""",
+            ImageStyle.PROFESSIONAL: f"""Professional business person in suit, confident expression, shot on Canon 5D with studio lighting, solid white or light gray background, upper body composition, diverse representation, high contrast for text overlay, square format, LinkedIn optimized. Context: {base_context}""",
+            ImageStyle.MODERN: f"""Modern business professional in contemporary attire, tech-savvy appearance, clean navy blue or teal solid background, professional photography, confident pose, diverse representation, high contrast, square format, mobile optimized. Context: {base_context}""",
+            ImageStyle.CREATIVE: f"""Creative professional with expressive but business-appropriate styling, approachable demeanor, simple vibrant colored background, artistic lighting, engaging eye contact, diverse representation, clean composition, high contrast for text. Context: {base_context}""",
+            ImageStyle.MINIMALIST: f"""Single business professional headshot, simple clothing, pure white background, minimal composition, sharp focus on person, professional lighting, lots of negative space, diverse representation, ultra-clean design. Context: {base_context}""",
+            ImageStyle.BOLD: f"""Confident business person with strong presence, professional attire, bold solid color background (deep blue or black), high contrast lighting, dynamic expression, diverse representation, square format, impactful composition. Context: {base_context}""",
         }
 
         return fallback_prompts.get(

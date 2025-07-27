@@ -55,7 +55,18 @@ export const useImageGeneration = () => {
             }
             // Update current step based on the completed step
             if (event.step) {
-              setCurrentStep(event.step);
+              // Map completed steps to next step
+              const stepProgression = {
+                'company_analysis': 'loading_references',
+                'loading_references': 'prompt_enhancement', 
+                'prompt_enhancement': 'copy_generation',
+                'copy_generation': 'image_generation',
+                'image_generation': 'completed'
+              };
+              const nextStep = stepProgression[event.step as keyof typeof stepProgression];
+              if (nextStep) {
+                setCurrentStep(nextStep);
+              }
             }
             break;
             
@@ -108,6 +119,15 @@ export const useImageGeneration = () => {
               }));
               setImages(completedImages);
               finalImages.push(...completedImages);
+            }
+            // Set ad copy from generation_complete event
+            if (event.ad_copy) {
+              console.log('Setting ad copy from generation_complete:', event.ad_copy);
+              setAdCopy(event.ad_copy);
+            }
+            // Set enhanced prompts
+            if (event.enhanced_prompts) {
+              setEnhancedPrompts(event.enhanced_prompts);
             }
             setProgressMessage('All images generated successfully!');
             setIsGenerating(false);
