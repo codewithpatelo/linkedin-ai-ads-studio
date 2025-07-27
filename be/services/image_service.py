@@ -113,7 +113,7 @@ class ImageGenerationService:
             Body Text: {state.request.body_text}
             Footer Text: {state.request.footer_text}
 
-            Based on research showing AI-generated marketing images achieve up to 50% higher CTR than stock photos, provide:
+            Provide:
             
             1. **Brand Personality & Visual Tone**: Analyze brand voice and recommend specific visual aesthetics (corporate, innovative, approachable, authoritative)
             2. **Audience Persona Insights**: Detail target customer demographics, pain points, and visual preferences for personalized imagery
@@ -153,42 +153,56 @@ class ImageGenerationService:
                     continue
 
                 style_prompt = f"""
-                Create a highly detailed DALL-E 3 prompt for a LinkedIn B2B ad image using research-backed prompt engineering techniques that achieve up to 50% higher CTR:
+            You are an expert LinkedIn advertising specialist and prompt engineer. Create an enhanced DALL-E 3 prompt for generating high-converting B2B LinkedIn ad images.
 
-                Company Context: {state.company_analysis or 'Professional business'}
-                Product: {state.request.product_name}
-                Business Value: {state.request.business_value}
-                Target Audience: {state.request.audience}
-                Body Text Context: {state.request.body_text}
-                Footer Text: {state.request.footer_text}
-                Style: {style.value}
+            **Complete Context Information:**
+            Company Analysis: {state.company_analysis or 'Professional business environment'}
+            Product/Service: {state.request.product_name}
+            Business Value Proposition: {state.request.business_value}
+            Target Audience: {state.request.audience}
+            Body Text Context: {state.request.body_text or 'Professional business messaging'}
+            Footer Text: {state.request.footer_text or 'Call-to-action messaging'}
+            Target Style: {style.value}
+            Reference Images Context: {len(state.reference_images)} professional LinkedIn ad references loaded
 
-                Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES
+            Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES + CTA OPTIMIZATION
 
-                **Required Elements:**
-                1. **Clear Action Verb**: Start with "Create a photorealistic image of..." or "Generate a professional scene showing..."
-                2. **Specific Subject**: Name exact people/objects (business professional, diverse team, SaaS dashboard, etc.)
-                3. **Rich Context**: Detailed environment (modern tech office, conference room, co-working space)
-                4. **Technical Photography**: Include "shot on Canon 5D with 50mm lens", lighting specifications, depth of field
-                5. **Audience Empathy**: Diverse, authentic professionals representing target customers (increases engagement ~23 points)
-                6. **B2B Credibility**: Thought leadership positioning, expertise signals, professional scenarios
-                7. **Data Elements**: Charts, dashboards, metrics, statistics relevant to business value
-                8. **Emotional Tone**: Specify mood (confident, collaborative, innovative), expressions, atmosphere
-                9. **Mobile Optimization**: High contrast areas for text overlay, clear visual hierarchy, 1200x1200px
-                10. **Thumb-Stopping Appeal**: Attention-grabbing elements balanced with B2B professionalism
+            **Required Elements (Must Include ALL):**
+            1. **Clear Action Verb**: Start with "Create a photorealistic image of..." or "Generate a professional scene showing..."
+            2. **Specific Subject**: Name exact people/objects related to {state.request.product_name} and {state.request.audience}
+            3. **Rich Context**: Detailed environment that reflects the company analysis and business value
+            4. **Technical Photography**: Include "shot on Canon 5D with 50mm lens, studio lighting, shallow depth of field"
+            5. **Audience Empathy**: Diverse, authentic professionals representing {state.request.audience} 
+            6. **B2B Credibility**: Thought leadership positioning, expertise signals related to {state.request.business_value}
+            7. **Data Elements**: Charts, dashboards, metrics, statistics that visualize the business value proposition
+            8. **Emotional Tone**: Specify mood that aligns with the target audience and business context
+            9. **CTA Optimization**: High contrast areas specifically designed for text overlay of "{state.request.footer_text or 'Learn More'}"
+            10. **Color Contrast**: Specify background colors that provide high contrast for white/dark text overlay
+            11. **Mobile Optimization**: Clear visual hierarchy optimized for 1200x1200px LinkedIn format
+            12. **Thumb-Stopping Appeal**: Attention-grabbing elements balanced with B2B professionalism
+            13. **Brand Context**: Visual elements that reflect the company's industry and professional context
+            14. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
 
-                **Style Specifications**: {self._get_style_description(style)}
+            **Style Specifications**: {self._get_style_description(style)}
 
-                **Technical Requirements**:
-                - Photorealistic quality with professional photography specifications
-                - LinkedIn-optimized composition (1:1 or 4:5 aspect ratio)
-                - High contrast backgrounds for text readability
-                - Professional lighting (studio, natural daylight, warm)
-                - Brand-aligned color palette
-                - Mobile-first design considerations
+            **Critical Technical Requirements**:
+            - Photorealistic quality with professional photography specifications
+            - LinkedIn-optimized composition (1:1 aspect ratio preferred)
+            - HIGH CONTRAST backgrounds (light backgrounds for dark text, dark backgrounds for light text)
+            - Professional lighting (studio quality, natural daylight, warm professional tones)
+            - Brand-aligned color palette that supports text readability
+            - Mobile-first design with clear focal points
+            - Space allocation for CTA text overlay in high-contrast areas
+            - Visual hierarchy that guides eye to CTA placement areas
 
-                Generate a single, extremely detailed prompt (150-200 words) optimized for maximum LinkedIn B2B engagement.
-                """
+            **CTA Integration Requirements**:
+            - Reserve 20-30% of image space for text overlay placement
+            - Ensure background contrast ratio of at least 4.5:1 for accessibility
+            - Consider CTA text: "{state.request.footer_text or 'Learn More'}" when designing contrast areas
+            - Include visual elements that naturally frame or highlight CTA placement
+
+            Generate a single, extremely detailed and comprehensive prompt (300-400 words) that incorporates ALL context information and optimizes for maximum LinkedIn B2B engagement and conversion.
+            """
 
                 response = await self.llm.ainvoke([HumanMessage(content=style_prompt)])
                 prompts.append(response.content.strip())
@@ -202,40 +216,73 @@ class ImageGenerationService:
         return state
 
     async def _load_reference_images(self, state: WorkflowState) -> WorkflowState:
-        """Load and encode reference images for enhanced prompt generation."""
+        """Load and encode reference images: 1 main_ref + 5 random non-main images."""
         try:
             reference_images = []
             # Use correct path relative to the backend directory
             ref_imgs_path = Path(__file__).parent.parent / "datasets" / "ref_imgs"
 
             if ref_imgs_path.exists():
-                # Get 3-5 random reference images
-                image_files = (
+                # Get all image files
+                all_image_files = (
                     list(ref_imgs_path.glob("*.png"))
                     + list(ref_imgs_path.glob("*.jpg"))
                     + list(ref_imgs_path.glob("*.jpeg"))
                 )
 
-                if image_files:
-                    selected_files = random.sample(
-                        image_files, min(4, len(image_files))
-                    )
+                if all_image_files:
+                    # Separate main_ref files from other files
+                    main_ref_files = [
+                        f for f in all_image_files if f.name.startswith("main_ref")
+                    ]
+                    other_files = [
+                        f for f in all_image_files if not f.name.startswith("main_ref")
+                    ]
 
-                    for img_path in selected_files:
+                    # Load 1 main_ref file (randomly selected if multiple exist)
+                    if main_ref_files:
+                        main_ref_file = random.choice(main_ref_files)
                         try:
-                            with open(img_path, "rb") as img_file:
+                            with open(main_ref_file, "rb") as img_file:
                                 img_data = base64.b64encode(img_file.read()).decode(
                                     "utf-8"
                                 )
                                 reference_images.append(img_data)
+                                logger.info(
+                                    f"Loaded main reference: {main_ref_file.name}"
+                                )
                         except Exception as e:
                             logger.warning(
-                                f"Could not load reference image {img_path}: {e}"
+                                f"Could not load main reference {main_ref_file}: {e}"
                             )
-                            continue
+
+                    # Load up to 5 random other images (non-main_ref)
+                    if other_files:
+                        selected_other_files = random.sample(
+                            other_files, min(5, len(other_files))
+                        )
+
+                        for img_path in selected_other_files:
+                            try:
+                                with open(img_path, "rb") as img_file:
+                                    img_data = base64.b64encode(img_file.read()).decode(
+                                        "utf-8"
+                                    )
+                                    reference_images.append(img_data)
+                            except Exception as e:
+                                logger.warning(
+                                    f"Could not load reference image {img_path}: {e}"
+                                )
+                                continue
+
+                        logger.info(
+                            f"Loaded {len(selected_other_files)} additional reference images"
+                        )
 
             state.reference_images = reference_images
-            logger.info(f"Loaded {len(reference_images)} reference images")
+            logger.info(
+                f"Total loaded reference images: {len(reference_images)} (1 main_ref + {len(reference_images)-1 if reference_images else 0} others)"
+            )
 
         except Exception as e:
             logger.error(f"Error loading reference images: {e}")
@@ -245,41 +292,90 @@ class ImageGenerationService:
         return state
 
     async def _generate_ad_copy(self, state: WorkflowState) -> WorkflowState:
-        """Generate LinkedIn ad copy (headline, description, CTA)."""
+        """Generate high-converting LinkedIn ad copy"""
         try:
             if not self.llm:
-                # Fallback copy generation
+                # Enhanced fallback copy generation with SpeedWork Social patterns
                 state.ad_copy = {
                     "headline": f"Transform Your Business with {state.request.product_name}",
                     "description": f"Discover how {state.request.product_name} delivers {state.request.business_value} for {state.request.audience}. Join thousands of satisfied customers.",
-                    "cta": "Learn More",
+                    "cta": "Book a Call",
                 }
                 return state
 
             copy_prompt = f"""
-            Create compelling LinkedIn B2B ad copy that follows proven conversion patterns:
+            Act as a LinkedIn advertising expert. Create high-converting B2B ad copy:
             
-            Company Context: {state.company_analysis or 'Professional business'}
-            Product: {state.request.product_name}
-            Business Value: {state.request.business_value}
+            **Campaign Context:**
+            Company Analysis: {state.company_analysis or 'Professional B2B business'}
+            Product/Service: {state.request.product_name}
+            Core Value Proposition: {state.request.business_value}
             Target Audience: {state.request.audience}
-            Body Text Context: {state.request.body_text}
+            Additional Context: {state.request.body_text}
             
+            **SpeedWork Social High-Performance Framework:**
+            
+            **1. AIDA Structure Implementation:**
+            - **Attention**: Hook that grabs attention (problem, stat, or compelling question)
+            - **Interest**: Clear value proposition that resonates with audience pain points
+            - **Desire**: Social proof, authority, or compelling outcome visualization
+            - **Action**: Persuasive, specific CTA that drives immediate response
+            
+            **2. Target Audience Deep Analysis:**
+            - Identify specific job titles and seniority levels within the audience
+            - Address core pain points and challenges they face daily
+            - Focus on desired outcomes and success metrics they care about
+            - Consider their decision-making process and buying triggers
+            
+            **3. Hook Strategies (Choose Most Effective):**
+            - **Problem Hook**: "Struggling with [specific pain point]?"
+            - **Stat Hook**: "[X]% of [audience] are missing out on [benefit]"
+            - **Question Hook**: "What if you could [achieve desired outcome] in [timeframe]?"
+            - **Curiosity Hook**: "The [industry] secret that [outcome]"
+            
+            **4. Value Proposition Guidelines:**
+            - Lead with the transformation/outcome, not the product features
+            - Quantify benefits where possible (time saved, revenue increased, etc.)
+            - Address the "what's in it for me" immediately
+            - Differentiate from competitors with unique positioning
+            
+            **5. Social Proof & Authority Elements:**
+            - Reference client results, case studies, or success stories
+            - Include industry recognition, certifications, or thought leadership
+            - Mention company size, growth metrics, or market position
+            - Use testimonial-style language when appropriate
+            
+            **6. CTA Optimization:**
+            - Use action-oriented language: "Book a Call", "Get Started", "Download Now"
+            - Create urgency without being pushy: "Limited spots", "Free consultation"
+            - Match CTA to funnel stage and audience readiness
+            - Keep CTAs specific and benefit-focused
+            
+            **7. LinkedIn B2B Best Practices:**
+            - Professional tone that builds trust and credibility
+            - Avoid overly promotional or salesy language
+            - Focus on business outcomes and ROI
+            - Use industry-appropriate terminology and context
+            - Ensure mobile-friendly formatting and readability
+            
+            **Output Requirements:**
             Generate JSON with exactly these fields:
             {{
-                "headline": "Compelling headline (max 150 chars) that hooks attention",
-                "description": "Value-focused description (max 600 chars) with social proof",
-                "cta": "Action-oriented CTA button text (max 20 chars)"
+                "headline": "Attention-grabbing headline (max 150 chars) using hook strategy",
+                "description": "AIDA-structured description (max 600 chars) with value prop + social proof",
+                "cta": "Compelling action-oriented CTA (max 20 chars)"
             }}
             
-            **Copy Guidelines:**
-            1. **Headline**: Use power words, numbers, or questions that create urgency
-            2. **Description**: Focus on transformation/outcome, include social proof if possible
-            3. **CTA**: Use action verbs like "Get", "Start", "Discover", "Transform"
-            4. **Tone**: Professional but conversational, benefit-focused
-            5. **LinkedIn Best Practices**: Avoid overly salesy language, focus on business value
+            **Quality Checklist:**
+            ✓ Hook immediately addresses audience pain point or desire
+            ✓ Value proposition is clear and benefit-focused
+            ✓ Social proof or authority signal included
+            ✓ CTA creates urgency and specifies next step
+            ✓ Professional tone appropriate for B2B LinkedIn
+            ✓ Mobile-optimized length and formatting
+            ✓ Differentiated positioning vs. competitors
             
-            Return only the JSON, no other text.
+            Return ONLY the JSON with no additional text or formatting.
             """
 
             response = await self.llm.ainvoke([HumanMessage(content=copy_prompt)])
@@ -290,20 +386,20 @@ class ImageGenerationService:
                 ad_copy = json.loads(response.content.strip())
                 state.ad_copy = ad_copy
             except json.JSONDecodeError:
-                # Fallback if JSON parsing fails
+                # Enhanced fallback if JSON parsing fails
                 state.ad_copy = {
-                    "headline": f"Transform Your Business with {state.request.product_name}",
-                    "description": f"Discover how {state.request.product_name} delivers {state.request.business_value} for {state.request.audience}.",
-                    "cta": "Learn More",
+                    "headline": f"Ready to Transform Your {state.request.audience} Strategy?",
+                    "description": f"See how {state.request.product_name} delivers {state.request.business_value}. Join industry leaders who've already made the switch.",
+                    "cta": "Book a Call",
                 }
 
         except Exception as e:
             logger.error(f"Error generating ad copy: {e}")
-            # Fallback copy
+            # Enhanced fallback copy with SpeedWork Social patterns
             state.ad_copy = {
-                "headline": f"Boost Your Business with {state.request.product_name}",
-                "description": f"See how {state.request.product_name} can help {state.request.audience} achieve {state.request.business_value}.",
-                "cta": "Get Started",
+                "headline": f"What if {state.request.audience} Could Achieve {state.request.business_value}?",
+                "description": f"Discover the proven solution that's helping businesses like yours unlock {state.request.business_value}. Don't let competitors get ahead.",
+                "cta": "Book a Call",
             }
 
         return state
@@ -350,13 +446,17 @@ class ImageGenerationService:
         try:
             if not self.openai_client:
                 # Return placeholder when no API key
+                logger.warning(f"🚫 No OpenAI client configured - returning placeholder for {style.value}")
                 return GeneratedImage(
                     id=str(uuid.uuid4()),
-                    url=f"https://via.placeholder.com/1024x1024?text=Modified+{style.value.title()}",
+                    url=f"https://via.placeholder.com/1024x1024?text=No+API+Key+{style.value.title()}",
                     style=style,
                     prompt_used=prompt,
                     generation_timestamp=datetime.now().isoformat(),
                 )
+            
+            logger.info(f"🎨 Generating {style.value} image with DALL-E 3...")
+            logger.info(f"📝 Prompt: {prompt[:100]}...")
 
             response = await self.openai_client.images.generate(
                 model="dall-e-3",
@@ -365,6 +465,8 @@ class ImageGenerationService:
                 quality="standard",
                 n=1,
             )
+            
+            logger.info(f"✅ DALL-E 3 generated image successfully: {response.data[0].url[:50]}...")
 
             return GeneratedImage(
                 id=str(uuid.uuid4()),
@@ -433,57 +535,119 @@ class ImageGenerationService:
     async def generate_images_with_progress(
         self, request: ImageGenerationRequest, event_stream_callback=None
     ) -> List[GeneratedImage]:
-        """Generate images with streaming progress updates."""
+        """Generate images with streaming progress updates including all workflow steps."""
         try:
-            if event_stream_callback:
-                await event_stream_callback(
-                    {
-                        "type": "progress",
-                        "step": "company_analysis",
-                        "message": "Analyzing company information...",
-                    }
-                )
-
             # Create initial state
-            initial_state = WorkflowState(request=request)
+            current_state = WorkflowState(request=request)
 
-            # Run company analysis
+            # Step 1: Company Analysis
             if event_stream_callback:
                 await event_stream_callback(
                     {
                         "type": "progress",
                         "step": "company_analysis",
-                        "message": "Extracting company insights...",
+                        "message": "🔍 Analyzing company information...",
                     }
                 )
 
-            state_after_analysis = await self._analyze_company_node(initial_state)
+            current_state = await self._analyze_company(current_state)
+            if current_state.error:
+                raise Exception(f"Company analysis failed: {current_state.error}")
 
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "step_completed",
+                        "step": "company_analysis",
+                        "message": "✅ Company analysis completed",
+                    }
+                )
+
+            # Step 2: Load Reference Images
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "progress",
+                        "step": "loading_references",
+                        "message": "📁 Loading reference ad examples...",
+                    }
+                )
+
+            current_state = await self._load_reference_images(current_state)
+            if current_state.error:
+                raise Exception(f"Reference loading failed: {current_state.error}")
+
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "step_completed",
+                        "step": "loading_references",
+                        "message": f"✅ Loaded {len(current_state.reference_images)} reference images",
+                    }
+                )
+
+            # Step 3: Generate Enhanced Prompts
             if event_stream_callback:
                 await event_stream_callback(
                     {
                         "type": "progress",
                         "step": "prompt_enhancement",
-                        "message": "Enhancing prompts with AI...",
+                        "message": "🎯 Enhancing prompts with AI...",
                     }
                 )
 
-            # Run prompt enhancement
-            state_after_prompts = await self._enhance_prompts_node(state_after_analysis)
+            current_state = await self._enhance_prompts(current_state)
+            if current_state.error:
+                raise Exception(f"Prompt enhancement failed: {current_state.error}")
 
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "step_completed",
+                        "step": "prompt_enhancement",
+                        "message": "✅ Enhanced prompts generated",
+                        "prompts": current_state.enhanced_prompts,
+                    }
+                )
+
+            # Step 4: Generate Ad Copy
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "progress",
+                        "step": "copy_generation",
+                        "message": "✍️ Generating compelling ad copy...",
+                    }
+                )
+
+            current_state = await self._generate_ad_copy(current_state)
+            if current_state.error:
+                raise Exception(f"Ad copy generation failed: {current_state.error}")
+
+            if event_stream_callback:
+                await event_stream_callback(
+                    {
+                        "type": "step_completed",
+                        "step": "copy_generation",
+                        "message": "✅ Ad copy generated",
+                        "ad_copy": current_state.ad_copy,
+                    }
+                )
+
+            # Step 5: Generate Images
             if event_stream_callback:
                 await event_stream_callback(
                     {
                         "type": "progress",
                         "step": "image_generation",
-                        "message": "Generating images with DALL-E 3...",
+                        "message": "🎨 Generating images with DALL-E 3...",
                     }
                 )
 
             # Generate images with progress updates
             images: List[GeneratedImage] = []
             for i, (prompt, style) in enumerate(
-                zip(state_after_prompts.enhanced_prompts, self.styles)
+                zip(current_state.enhanced_prompts, self.styles)
             ):
                 try:
                     if event_stream_callback:
@@ -491,7 +655,7 @@ class ImageGenerationService:
                             {
                                 "type": "progress",
                                 "step": "image_generation",
-                                "message": f"Generating {style.value} style image ({i+1}/5)...",
+                                "message": f"🎨 Generating {style.value} style image ({i+1}/5)...",
                             }
                         )
 
@@ -507,7 +671,7 @@ class ImageGenerationService:
                             {
                                 "type": "image_ready",
                                 "step": "image_generation",
-                                "message": f"{style.value} style image completed",
+                                "message": f"✅ {style.value} style image completed",
                                 "image": image.dict(),
                                 "progress": f"{i+1}/5",
                             }
@@ -520,7 +684,7 @@ class ImageGenerationService:
                             {
                                 "type": "error",
                                 "step": "image_generation",
-                                "message": f"Failed to generate {style.value} style image: {str(e)}",
+                                "message": f"❌ Failed to generate {style.value} style image: {str(e)}",
                             }
                         )
                     continue
@@ -532,13 +696,25 @@ class ImageGenerationService:
                 for image in images:
                     image.request_id = request_id
 
+                if event_stream_callback:
+                    await event_stream_callback(
+                        {
+                            "type": "generation_complete",
+                            "message": f"🎉 All {len(images)} images generated successfully!",
+                            "images": [img.dict() for img in images],
+                            "enhanced_prompts": current_state.enhanced_prompts,
+                            "ad_copy": current_state.ad_copy,
+                            "request_id": request_id,
+                        }
+                    )
+
             return images
 
         except Exception as e:
             logger.error(f"Error in generate_images_with_progress: {e}")
             if event_stream_callback:
                 await event_stream_callback(
-                    {"type": "error", "message": f"Generation failed: {str(e)}"}
+                    {"type": "error", "message": f"❌ Generation failed: {str(e)}"}
                 )
             return await self._fallback_generation(request)
 

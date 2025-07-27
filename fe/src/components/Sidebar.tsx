@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Terminal, Copy, Check, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdCopy } from '@/services/api';
 
 interface SidebarProps {
@@ -126,15 +126,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <CardContent className="space-y-3">
                   {['company_analysis', 'loading_references', 'prompt_enhancement', 'copy_generation', 'image_generation'].map((step) => {
                     const status = getStepStatus(step);
+                    const isActive = status === 'active';
+                    
+                    // Define step-specific animations and messages
+                    const stepConfig = {
+                      'company_analysis': { icon: '🔍', loader: '🔍', message: 'Analyzing company...', time: '5-10 seconds' },
+                      'loading_references': { icon: '🖼️', loader: '🖼️', message: 'Loading references...', time: '3-5 seconds' },
+                      'prompt_enhancement': { icon: '✨', loader: '✨', message: 'Enhancing prompts...', time: '10-15 seconds' },
+                      'copy_generation': { icon: '📝', loader: '📝', message: 'Generating copy...', time: '5-10 seconds' },
+                      'image_generation': { icon: '🎨', loader: '🎨', message: 'Generating images...', time: '30-60 seconds' }
+                    };
+                    
+                    const config = stepConfig[step as keyof typeof stepConfig];
+                    
                     return (
                       <div key={step} className="flex items-center gap-3">
-                        <span className="text-lg">{getStepIcon(status)}</span>
+                        <span className="text-lg">
+                          {isActive ? (
+                            <div className="animate-spin text-blue-600">{config.loader}</div>
+                          ) : (
+                            getStepIcon(status)
+                          )}
+                        </span>
                         <span className={`text-sm ${status === 'active' ? 'font-medium text-blue-600' : status === 'completed' ? 'text-green-600' : 'text-gray-500'}`}>
                           {formatStepName(step)}
+                          {isActive && (
+                            <span className="ml-2 text-xs text-blue-500 animate-pulse">
+                              ({config.time})
+                            </span>
+                          )}
                         </span>
                         {status === 'active' && (
-                          <Badge variant="secondary" className="ml-auto">
-                            Active
+                          <Badge variant="secondary" className="ml-auto animate-pulse bg-blue-100 text-blue-700">
+                            {config.message.split(' ')[0]}...
                           </Badge>
                         )}
                       </div>
@@ -215,12 +239,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </CardHeader>
                   {showPrompts && (
                     <CardContent className="space-y-4">
-                      {enhancedPrompts.map((prompt, index) => (
+                      {enhancedPrompts.map((prompt, index) => {
+                        const styleNames = ['Professional', 'Modern', 'Creative', 'Minimalist', 'Bold'];
+                        const styleName = styleNames[index] || `Style ${index + 1}`;
+                        const styleColors = {
+                          'Professional': 'bg-blue-100 text-blue-800',
+                          'Modern': 'bg-purple-100 text-purple-800',
+                          'Creative': 'bg-pink-100 text-pink-800',
+                          'Minimalist': 'bg-gray-100 text-gray-800',
+                          'Bold': 'bg-orange-100 text-orange-800'
+                        };
+                        
+                        return (
                         <div key={index} className="border rounded-lg">
                           <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
-                            <span className="text-xs font-medium text-gray-600">
-                              Style {index + 1} Prompt
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <Badge className={`text-xs ${styleColors[styleName as keyof typeof styleColors] || 'bg-gray-100 text-gray-800'}`}>
+                                {styleName}
+                              </Badge>
+                              <span className="text-xs font-medium text-gray-600">
+                                Enhanced Prompt
+                              </span>
+                            </div>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -240,7 +280,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </CardContent>
                   )}
                 </Card>

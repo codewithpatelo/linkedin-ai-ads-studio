@@ -37,7 +37,7 @@ export interface AdCopy {
 }
 
 export interface StreamEvent {
-  type: 'started' | 'progress' | 'step_completed' | 'prompts_ready' | 'copy_ready' | 'image_ready' | 'completed' | 'error' | 'end';
+  type: 'step_started' | 'progress' | 'step_completed' | 'prompts_ready' | 'copy_ready' | 'image_ready' | 'generation_complete' | 'error' | 'done';
   step?: string;
   message: string;
   request_id?: string;

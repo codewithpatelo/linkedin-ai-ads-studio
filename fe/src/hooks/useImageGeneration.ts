@@ -19,15 +19,13 @@ export const useImageGeneration = () => {
   const [currentStep, setCurrentStep] = useState<string>('');
   const [enhancedPrompts, setEnhancedPrompts] = useState<string[]>([]);
   const [adCopy, setAdCopy] = useState<AdCopy | null>(null);
-  const [consoleMessages, setConsoleMessages] = useState<string[]>([]);
-
+  const [showPrompts, setShowPrompts] = useState(false);
 
   const generateImages = async (companyData: CompanyFormData): Promise<GeneratedImage[]> => {
     setIsGenerating(true);
     setImages([]);
     setProgressMessage('Starting image generation...');
     setCurrentStep('');
-    setConsoleMessages([]);
     
     return new Promise((resolve, reject) => {
       let finalImages: GeneratedImage[] = [];
@@ -36,42 +34,39 @@ export const useImageGeneration = () => {
         console.log('Stream event:', event);
         
         switch (event.type) {
-          case 'started':
+          case 'step_started':
+            console.log('🚀 Step started:', event.step, event.message);
             setProgressMessage(event.message);
+            setCurrentStep(event.step || '');
             if (event.request_id) {
               setRequestId(event.request_id);
             }
             break;
             
           case 'progress':
+            console.log('📊 Progress:', event.message);
             setProgressMessage(event.message);
-            setCurrentStep(event.step || '');
-            break;
-            
-          case 'step_completed':
-            // Add detailed step completion message to console
-            setConsoleMessages(prev => [...prev, event.message]);
-            setCurrentStep(event.step || '');
-            
-            // If this step has results, show them in console too
-            if (event.results) {
-              if (event.results.enhanced_prompts) {
-                setConsoleMessages(prev => [...prev, `📝 Enhanced prompts ready (${event.results.enhanced_prompts.length} styles)`]);
-              }
-              if (event.results.ad_copy) {
-                setConsoleMessages(prev => [...prev, `📢 Ad copy generated: "${event.results.ad_copy.headline}"`]);
-              }
+            if (event.step) {
+              setCurrentStep(event.step);
             }
             break;
             
+          case 'step_completed':
+            console.log('✅ Step completed:', event.message);
+            setProgressMessage(event.message);
+            break;
+            
           case 'prompts_ready':
+            console.log('✨ Prompts ready:', event.prompts?.length);
             if (event.prompts) {
               setEnhancedPrompts(event.prompts);
+              setShowPrompts(true);
             }
             setProgressMessage(event.message);
             break;
             
           case 'copy_ready':
+            console.log('📝 Copy ready:', event.ad_copy);
             if (event.ad_copy) {
               setAdCopy(event.ad_copy);
             }
@@ -79,6 +74,7 @@ export const useImageGeneration = () => {
             break;
             
           case 'image_ready':
+            console.log('🖼️ Image ready:', event.image?.style);
             if (event.image) {
               const transformedImage: GeneratedImage = {
                 id: event.image.id,
@@ -93,7 +89,8 @@ export const useImageGeneration = () => {
             setProgressMessage(event.message);
             break;
             
-          case 'completed':
+          case 'generation_complete':
+            console.log('🎉 Generation complete:', event.images?.length, 'images');
             if (event.images) {
               const transformedImages: GeneratedImage[] = event.images.map((img) => ({
                 id: img.id,
@@ -111,12 +108,14 @@ export const useImageGeneration = () => {
             break;
             
           case 'error':
+            console.error('❌ Error:', event.message);
             setProgressMessage(`Error: ${event.message}`);
             setIsGenerating(false);
             reject(new Error(event.message));
             break;
             
-          case 'end':
+          case 'done':
+            console.log('🏁 Stream done');
             setIsGenerating(false);
             if (finalImages.length === 0) {
               reject(new Error('No images were generated'));
@@ -170,7 +169,7 @@ export const useImageGeneration = () => {
     setRequestId(null);
     setEnhancedPrompts([]);
     setAdCopy(null);
-    setConsoleMessages([]);
+    setShowPrompts(false);
   };
 
   return {
@@ -182,7 +181,8 @@ export const useImageGeneration = () => {
     currentStep,
     enhancedPrompts,
     adCopy,
-    consoleMessages,
+    showPrompts,
+    setShowPrompts,
     generateImages,
     regenerateImage,
     clearImages
