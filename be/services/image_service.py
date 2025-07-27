@@ -193,7 +193,7 @@ class ImageGenerationService:
            - Thumb-stopping appeal without being flashy
            - Appropriate for {state.request.audience} in {state.request.product_name} context
 
-        The prompt should be concise (max 250 words) with the goal to create a professional LinkedIn ad image with:
+        The prompt should be concise (max 300 words) with the goal to create a professional LinkedIn ad image with:
         - A business person representing {state.request.audience}
         - Simple, clean background (no complex environments)
         - Style {style.value} specs must be highly differenciated and present in the prompt.
@@ -338,11 +338,10 @@ class ImageGenerationService:
             **Campaign Context:**
             Company Analysis: {state.company_analysis or 'Professional B2B business'}
             Product/Service: {state.request.product_name}
-            Core Value Proposition: {state.request.business_value}
+            Core Values {state.request.business_value}
             Target Audience: {state.request.audience}
-            Additional Context: {state.request.body_text}
             
-            **SpeedWork Social High-Performance Framework:**
+            **High-Performance Framework:**
             
             **1. AIDA Structure Implementation:**
             - **Attention**: Hook that grabs attention (problem, stat, or compelling question)
@@ -406,7 +405,11 @@ class ImageGenerationService:
             
             Return ONLY the JSON with no additional text or formatting.
             """
-
+            if state.request.body_text:
+                copy_prompt += f"\n\nfill out description field with this text: {state.request.body_text}"
+            if state.request.footer_text:
+                copy_prompt += f"\n\nfill out cta field with this text: {state.request.footer_text}"
+                
             response = await self.llm.ainvoke([HumanMessage(content=copy_prompt)])
 
             try:
