@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { CompanyForm, CompanyFormData } from '@/components/CompanyForm';
-import { ImageGallery } from '@/components/ImageGallery';
+import React, { useState } from "react";
+import { CompanyForm, CompanyFormData } from "@/components/CompanyForm";
+import { ImageGallery } from "@/components/ImageGallery";
 
-import { useImageGeneration } from '@/hooks/useImageGeneration';
-import { toast } from 'sonner';
-import { Sidebar } from '@/components/Sidebar';
-
+import { useImageGeneration } from "@/hooks/useImageGeneration";
+import { toast } from "sonner";
+import { Sidebar } from "@/components/Sidebar";
 
 type AppState = "form" | "gallery";
 
@@ -13,11 +12,11 @@ const Index = () => {
   const [appState, setAppState] = useState<AppState>("form");
   const [companyData, setCompanyData] = useState<CompanyFormData | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  const { 
-    images, 
-    isGenerating, 
-    isRegenerating, 
+
+  const {
+    images,
+    isGenerating,
+    isRegenerating,
     progressMessage,
     currentStep,
     enhancedPrompts,
@@ -25,8 +24,8 @@ const Index = () => {
     showPrompts,
     setShowPrompts,
     consoleMessages,
-    generateImages, 
-    regenerateImage 
+    generateImages,
+    regenerateImage,
   } = useImageGeneration();
 
   const handleFormSubmit = async (data: CompanyFormData) => {
@@ -34,11 +33,13 @@ const Index = () => {
       setCompanyData(data);
       setIsSidebarOpen(true); // Open sidebar when form is submitted
       const generatedImages = await generateImages(data);
-      
+
       if (generatedImages.length > 0) {
         setAppState("gallery");
-        setIsSidebarOpen(false)
-        toast.success(`Successfully generated ${generatedImages.length} LinkedIn ads!`);
+        setIsSidebarOpen(false);
+        toast.success(
+          `Successfully generated ${generatedImages.length} LinkedIn ads!`
+        );
       } else {
         toast.error("Failed to generate images. Please try again.");
       }
@@ -52,7 +53,10 @@ const Index = () => {
     setAppState("form");
   };
 
-  const handleRegenerateImage = async (imageId: string, modificationPrompt: string) => {
+  const handleRegenerateImage = async (
+    imageId: string,
+    modificationPrompt: string
+  ) => {
     try {
       await regenerateImage(imageId, modificationPrompt);
       toast.success("Image regenerated successfully!");
@@ -106,13 +110,13 @@ const Index = () => {
 
   return (
     <>
-      <CompanyForm 
-        onSubmit={handleFormSubmit} 
+      <CompanyForm
+        onSubmit={handleFormSubmit}
         isGenerating={isGenerating}
         progressMessage={progressMessage}
         currentStep={currentStep}
       />
-      
+
       {/* Sidebar with Console View */}
       <Sidebar
         isOpen={isSidebarOpen}

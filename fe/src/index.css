@@ -31,18 +31,45 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 100%;
 
     /* Enhanced gradients with depth */
-    --gradient-primary: linear-gradient(135deg, hsl(220, 90%, 56%), hsl(220, 100%, 70%), hsl(240, 90%, 75%));
-    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%) 0%, hsl(220, 15%, 98%) 50%, hsl(220, 20%, 96%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(220, 90%, 56%) 0%, hsl(240, 85%, 62%) 50%, hsl(260, 80%, 65%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(220, 30%, 98%) 0%, hsl(220, 15%, 96%) 100%);
-    --gradient-shimmer: linear-gradient(90deg, transparent 0%, hsl(220, 100%, 70% / 0.1) 50%, transparent 100%);
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(220, 90%, 56%),
+      hsl(220, 100%, 70%),
+      hsl(240, 90%, 75%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(0, 0%, 100%) 0%,
+      hsl(220, 15%, 98%) 50%,
+      hsl(220, 20%, 96%) 100%
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(220, 90%, 56%) 0%,
+      hsl(240, 85%, 62%) 50%,
+      hsl(260, 80%, 65%) 100%
+    );
+    --gradient-subtle: linear-gradient(
+      180deg,
+      hsl(220, 30%, 98%) 0%,
+      hsl(220, 15%, 96%) 100%
+    );
+    --gradient-shimmer: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(220, 100%, 70% / 0.1) 50%,
+      transparent 100%
+    );
+
     /* Enhanced shadows with depth */
-    --shadow-card: 0 4px 20px -8px hsl(220, 90%, 56% / 0.15), 0 1px 4px -2px hsl(220, 90%, 56% / 0.1);
-    --shadow-button: 0 4px 12px -4px hsl(220, 90%, 56% / 0.25), 0 2px 6px -2px hsl(220, 90%, 56% / 0.15);
-    --shadow-elevated: 0 8px 30px -12px hsl(220, 90%, 56% / 0.2), 0 4px 16px -8px hsl(220, 90%, 56% / 0.1);
+    --shadow-card: 0 4px 20px -8px hsl(220, 90%, 56% / 0.15),
+      0 1px 4px -2px hsl(220, 90%, 56% / 0.1);
+    --shadow-button: 0 4px 12px -4px hsl(220, 90%, 56% / 0.25),
+      0 2px 6px -2px hsl(220, 90%, 56% / 0.15);
+    --shadow-elevated: 0 8px 30px -12px hsl(220, 90%, 56% / 0.2),
+      0 4px 16px -8px hsl(220, 90%, 56% / 0.1);
     --shadow-glow: 0 0 20px hsl(220, 100%, 70% / 0.3);
-    
+
     /* Animation variables */
     --animation-fast: 0.15s;
     --animation-normal: 0.3s;
@@ -145,7 +172,7 @@ All colors MUST be HSL.
   }
 
   .animate-shimmer::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
@@ -157,8 +184,8 @@ All colors MUST be HSL.
 
   /* Enhanced hover effects */
   .hover-lift {
-    transition: transform var(--animation-fast) var(--ease-smooth), 
-                box-shadow var(--animation-fast) var(--ease-smooth);
+    transition: transform var(--animation-fast) var(--ease-smooth),
+      box-shadow var(--animation-fast) var(--ease-smooth);
   }
 
   .hover-lift:hover {

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff, Copy, Check } from "lucide-react";
+import { useState } from "react";
 
 interface PromptViewerProps {
   prompts: string[];
@@ -23,7 +23,7 @@ export const PromptViewer: React.FC<PromptViewerProps> = ({
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      console.error("Failed to copy text: ", err);
     }
   };
 
@@ -32,7 +32,9 @@ export const PromptViewer: React.FC<PromptViewerProps> = ({
   return (
     <div className="w-full mb-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">Enhanced Prompts</h3>
+        <h3 className="text-lg font-semibold text-gray-800">
+          Enhanced Prompts
+        </h3>
         <Button
           variant="outline"
           size="sm"

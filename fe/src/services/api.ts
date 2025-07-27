@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
 export interface CompanyFormData {
   companyUrl: string;
@@ -37,7 +38,16 @@ export interface AdCopy {
 }
 
 export interface StreamEvent {
-  type: 'step_started' | 'progress' | 'step_completed' | 'prompts_ready' | 'copy_ready' | 'image_ready' | 'generation_complete' | 'error' | 'done';
+  type:
+    | "step_started"
+    | "progress"
+    | "step_completed"
+    | "prompts_ready"
+    | "copy_ready"
+    | "image_ready"
+    | "generation_complete"
+    | "error"
+    | "done";
   step?: string;
   message: string;
   request_id?: string;
@@ -64,10 +74,10 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    
+
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
@@ -75,7 +85,7 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         const errorData = await response.text();
         throw new Error(`API Error ${response.status}: ${errorData}`);
@@ -83,12 +93,14 @@ class ApiService {
 
       return await response.json();
     } catch (error) {
-      console.error('API Request failed:', error);
+      console.error("API Request failed:", error);
       throw error;
     }
   }
 
-  async generateImages(data: CompanyFormData): Promise<ImageGenerationResponse> {
+  async generateImages(
+    data: CompanyFormData
+  ): Promise<ImageGenerationResponse> {
     // Transform frontend data to match backend schema
     const requestData = {
       company_url: data.companyUrl,
@@ -99,8 +111,8 @@ class ApiService {
       footer_text: data.footerText,
     };
 
-    return this.request<ImageGenerationResponse>('/images/generate', {
-      method: 'POST',
+    return this.request<ImageGenerationResponse>("/images/generate", {
+      method: "POST",
       body: JSON.stringify(requestData),
     });
   }
@@ -114,8 +126,8 @@ class ApiService {
       modification_prompt: modificationPrompt,
     };
 
-    return this.request<ImageModificationResponse>('/images/modify', {
-      method: 'POST',
+    return this.request<ImageModificationResponse>("/images/modify", {
+      method: "POST",
       body: JSON.stringify(requestData),
     });
   }
@@ -124,7 +136,7 @@ class ApiService {
     styles: string[];
     descriptions: Record<string, string>;
   }> {
-    return this.request('/images/styles');
+    return this.request("/images/styles");
   }
 
   async getGeneratedImages(requestId: string): Promise<{
@@ -136,12 +148,12 @@ class ApiService {
 
   async deleteGeneratedImages(requestId: string): Promise<{ message: string }> {
     return this.request(`/images/request/${requestId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   async healthCheck(): Promise<{ status: string }> {
-    const url = API_BASE_URL.replace('/api/v1', '/health');
+    const url = API_BASE_URL.replace("/api/v1", "/health");
     const response = await fetch(url);
     return response.json();
   }
@@ -160,9 +172,9 @@ class ApiService {
     };
 
     const response = await fetch(`${API_BASE_URL}/stream/generate`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData),
     });
@@ -173,11 +185,11 @@ class ApiService {
 
     const reader = response.body?.getReader();
     if (!reader) {
-      throw new Error('Failed to get response reader');
+      throw new Error("Failed to get response reader");
     }
 
     const decoder = new TextDecoder();
-    let buffer = '';
+    let buffer = "";
 
     try {
       while (true) {
@@ -185,20 +197,20 @@ class ApiService {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             try {
               const eventData = JSON.parse(line.slice(6));
               onEvent(eventData as StreamEvent);
-              
-              if (eventData.type === 'end') {
+
+              if (eventData.type === "end") {
                 return;
               }
             } catch (e) {
-              console.error('Failed to parse SSE data:', e);
+              console.error("Failed to parse SSE data:", e);
             }
           }
         }

@@ -429,7 +429,7 @@ class ImageGenerationService:
                 copy_prompt += f"\n\nfill out description field with this text: {state.request.body_text}"
             if state.request.footer_text:
                 copy_prompt += f"\n\nfill out cta field with this text: {state.request.footer_text}"
-                
+
             response = await self.llm.ainvoke([HumanMessage(content=copy_prompt)])
 
             try:
@@ -751,17 +751,21 @@ class ImageGenerationService:
             # Store images with request ID
             if images:
                 # Use the request_id we generated at the beginning
-                logger.info(f"Storing {len(images)} images with request_id: {request_id}")
+                logger.info(
+                    f"Storing {len(images)} images with request_id: {request_id}"
+                )
                 img_ids = [img.id for img in images]
                 logger.info(f"Image IDs being stored: {img_ids}")
-                
+
                 self.image_storage[request_id] = images
                 # Ensure all images have the same request_id (should already be set)
                 for image in images:
                     if not image.request_id:
                         image.request_id = request_id
-                        
-                logger.info(f"Successfully stored images. Total storage entries: {len(self.image_storage)}")
+
+                logger.info(
+                    f"Successfully stored images. Total storage entries: {len(self.image_storage)}"
+                )
 
                 if event_stream_callback:
                     await event_stream_callback(

@@ -1,9 +1,16 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Download, ExternalLink, ThumbsUp, MessageCircle, Share, Send } from 'lucide-react';
-import { AdCopy } from '@/services/api';
-import { GeneratedImage } from '@/hooks/useImageGeneration';
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Download,
+  ExternalLink,
+  ThumbsUp,
+  MessageCircle,
+  Share,
+  Send,
+} from "lucide-react";
+import { AdCopy } from "@/services/api";
+import { GeneratedImage } from "@/hooks/useImageGeneration";
 
 interface AdPreviewProps {
   images: GeneratedImage[];
@@ -14,14 +21,14 @@ interface AdPreviewProps {
 export const AdPreview: React.FC<AdPreviewProps> = ({
   images,
   adCopy,
-  companyName = "Your Company"
+  companyName = "Your Company",
 }) => {
   const downloadImage = async (imageUrl: string, imageName: string) => {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `${imageName}.png`;
       document.body.appendChild(link);
@@ -29,7 +36,7 @@ export const AdPreview: React.FC<AdPreviewProps> = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading image:', error);
+      console.error("Error downloading image:", error);
     }
   };
 
@@ -38,14 +45,21 @@ export const AdPreview: React.FC<AdPreviewProps> = ({
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-800">LinkedIn Ad Preview</h3>
+        <h3 className="text-xl font-semibold text-gray-800">
+          LinkedIn Ad Preview
+        </h3>
         <div className="flex gap-2">
           {images.map((image, index) => (
             <Button
               key={image.id}
               variant="outline"
               size="sm"
-              onClick={() => downloadImage(image.url, `linkedin-ad-${image.style}-${index + 1}`)}
+              onClick={() =>
+                downloadImage(
+                  image.url,
+                  `linkedin-ad-${image.style}-${index + 1}`
+                )
+              }
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
@@ -57,7 +71,10 @@ export const AdPreview: React.FC<AdPreviewProps> = ({
 
       <div className="grid gap-6">
         {images.map((image, index) => (
-          <Card key={image.id} className="max-w-2xl mx-auto border border-gray-200 shadow-sm">
+          <Card
+            key={image.id}
+            className="max-w-2xl mx-auto border border-gray-200 shadow-sm"
+          >
             {/* LinkedIn Post Header */}
             <div className="p-4 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -97,7 +114,12 @@ export const AdPreview: React.FC<AdPreviewProps> = ({
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => downloadImage(image.url, `linkedin-ad-${image.style}-${index + 1}`)}
+                    onClick={() =>
+                      downloadImage(
+                        image.url,
+                        `linkedin-ad-${image.style}-${index + 1}`
+                      )
+                    }
                     className="bg-white/90 hover:bg-white text-gray-700 shadow-sm"
                   >
                     <Download className="h-4 w-4" />
@@ -147,8 +169,9 @@ export const AdPreview: React.FC<AdPreviewProps> = ({
       {images.length > 0 && (
         <div className="text-center">
           <p className="text-sm text-gray-500">
-            Generated {images.length} ad{images.length > 1 ? 's' : ''} in{' '}
-            {images.map(img => img.style).join(', ')} style{images.length > 1 ? 's' : ''}
+            Generated {images.length} ad{images.length > 1 ? "s" : ""} in{" "}
+            {images.map((img) => img.style).join(", ")} style
+            {images.length > 1 ? "s" : ""}
           </p>
         </div>
       )}
