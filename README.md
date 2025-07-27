@@ -2,13 +2,34 @@
 
 ![alt text](image.png)
 
-An AI-powered image generation platform that creates professional LinkedIn advertisement images with real-time streaming progress, enhanced prompt generation, and professional ad copy creation.
+An AI-powered image generation platform that creates professional LinkedIn advertisement images with real-time streaming progress, enhanced prompt generation, and professional ad copy enhancement.
+
+The UX is simple. User fills up a form with product name, company URL, targets audience and business values. The user have the option to specify the body text and footer text. Then, a fully-automated ad generation pipeline do the magic.
+
+The pipeline is as follows:
+
+1. Company Analysis: Based on user input, the system analyzes the company to understand their brand and context.
+2. Prompt Enhancement: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
+3. Image Generation: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
+4. Image Modification: The system modifies the images to improve the quality of the generated images.
 
 ## Quick Setup
+To make things easy. We used MAKEFILES.
 
-**Backend**: `cd be && python3.11 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000`  
-**Frontend**: `cd fe && npm run dev`  
-**Environment**: Add `OPENAI_API_KEY` to `be/.env`
+At root level, just do:
+
+```bash
+make setup
+```
+Make sure to add .env file with OPEN AI API KEYS.
+
+Then:
+
+
+```bash
+make quick-dev
+```
+
 
 ## Project Structure
 
@@ -76,34 +97,6 @@ linkedin-ads/
 - Node.js 18+
 - OpenAI API key with DALL-E 3 access
 
-### Backend Setup
-1. **Install dependencies**:
-   ```bash
-   cd be
-   pip install -r requirements.txt
-   ```
-
-2. **Configure environment**:
-   ```bash
-   echo "OPENAI_API_KEY=your_key_here" > .env
-   ```
-
-3. **Run backend**:
-   ```bash
-   python3.11 -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-### Frontend Setup
-1. **Install dependencies**:
-   ```bash
-   cd fe
-   npm install
-   ```
-
-2. **Run frontend**:
-   ```bash
-   npm run dev
-   ```
 
 ### Access Application
 - **Frontend**: http://localhost:8080
