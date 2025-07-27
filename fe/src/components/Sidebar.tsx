@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Terminal, Copy, Check, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AdCopy } from '@/services/api';
-import { useState } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,6 +13,7 @@ interface SidebarProps {
   enhancedPrompts: string[];
   adCopy: AdCopy | null;
   isGenerating: boolean;
+  consoleMessages: string[];
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -24,6 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   enhancedPrompts,
   adCopy,
   isGenerating,
+  consoleMessages = [],
 }) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [showPrompts, setShowPrompts] = useState(false);
@@ -34,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (consoleRef.current) {
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }
-  }, [progressMessage, enhancedPrompts, adCopy]);
+  }, [progressMessage, enhancedPrompts, adCopy, consoleMessages]);
 
   // Show prompts automatically when they're ready
   useEffect(() => {
@@ -153,16 +154,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <CardContent>
                   <div 
                     ref={consoleRef}
-                    className="bg-gray-900 text-green-400 p-4 rounded-md font-mono text-xs h-32 overflow-y-auto"
+                    className="bg-gray-900 text-green-400 p-4 rounded-md font-mono text-xs h-48 overflow-y-auto"
                   >
                     <div className="space-y-1">
                       <div className="text-gray-500">$ linkedin-ads-generator --start</div>
                       <div>🚀 Initializing LinkedIn Ads Generation Studio...</div>
+                      
+                      {/* Show all console messages */}
+                      {consoleMessages.map((message, index) => (
+                        <div key={index} className="text-green-400">
+                          [{new Date().toLocaleTimeString()}] {message}
+                        </div>
+                      ))}
+                      
+                      {/* Show current progress message */}
                       {progressMessage && (
                         <div className="text-yellow-400">
                           [{new Date().toLocaleTimeString()}] {progressMessage}
                         </div>
                       )}
+                      
+                      {/* Show completion message */}
                       {!isGenerating && enhancedPrompts.length > 0 && (
                         <div className="text-green-400">
                           ✅ Generation completed successfully!

@@ -19,6 +19,7 @@ export const useImageGeneration = () => {
   const [currentStep, setCurrentStep] = useState<string>('');
   const [enhancedPrompts, setEnhancedPrompts] = useState<string[]>([]);
   const [adCopy, setAdCopy] = useState<AdCopy | null>(null);
+  const [consoleMessages, setConsoleMessages] = useState<string[]>([]);
 
 
   const generateImages = async (companyData: CompanyFormData): Promise<GeneratedImage[]> => {
@@ -26,6 +27,7 @@ export const useImageGeneration = () => {
     setImages([]);
     setProgressMessage('Starting image generation...');
     setCurrentStep('');
+    setConsoleMessages([]);
     
     return new Promise((resolve, reject) => {
       let finalImages: GeneratedImage[] = [];
@@ -44,6 +46,22 @@ export const useImageGeneration = () => {
           case 'progress':
             setProgressMessage(event.message);
             setCurrentStep(event.step || '');
+            break;
+            
+          case 'step_completed':
+            // Add detailed step completion message to console
+            setConsoleMessages(prev => [...prev, event.message]);
+            setCurrentStep(event.step || '');
+            
+            // If this step has results, show them in console too
+            if (event.results) {
+              if (event.results.enhanced_prompts) {
+                setConsoleMessages(prev => [...prev, `📝 Enhanced prompts ready (${event.results.enhanced_prompts.length} styles)`]);
+              }
+              if (event.results.ad_copy) {
+                setConsoleMessages(prev => [...prev, `📢 Ad copy generated: "${event.results.ad_copy.headline}"`]);
+              }
+            }
             break;
             
           case 'prompts_ready':
@@ -152,7 +170,7 @@ export const useImageGeneration = () => {
     setRequestId(null);
     setEnhancedPrompts([]);
     setAdCopy(null);
-
+    setConsoleMessages([]);
   };
 
   return {
@@ -164,8 +182,7 @@ export const useImageGeneration = () => {
     currentStep,
     enhancedPrompts,
     adCopy,
-
-
+    consoleMessages,
     generateImages,
     regenerateImage,
     clearImages

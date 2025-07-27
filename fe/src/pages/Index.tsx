@@ -20,6 +20,7 @@ const Index = () => {
     currentStep,
     enhancedPrompts,
     adCopy,
+    consoleMessages,
     generateImages, 
     regenerateImage 
   } = useImageGeneration();
@@ -89,6 +90,7 @@ const Index = () => {
           enhancedPrompts={enhancedPrompts}
           adCopy={adCopy}
           isGenerating={isGenerating}
+          consoleMessages={consoleMessages}
         />
       </div>
     );
@@ -112,6 +114,7 @@ const Index = () => {
         enhancedPrompts={enhancedPrompts}
         adCopy={adCopy}
         isGenerating={isGenerating}
+        consoleMessages={consoleMessages}
       />
     </>
   );
