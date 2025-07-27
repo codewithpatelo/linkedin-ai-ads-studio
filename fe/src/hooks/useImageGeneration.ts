@@ -158,7 +158,13 @@ export const useImageGeneration = () => {
     setIsRegenerating(prev => ({ ...prev, [imageId]: true }));
 
     try {
-      const response = await apiService.modifyImage(imageId, modificationPrompt);
+      // Find the image to get its URL
+      const imageToModify = images.find(img => img.id === imageId);
+      if (!imageToModify) {
+        throw new Error('Image not found');
+      }
+      
+      const response = await apiService.modifyImage(imageToModify.url, modificationPrompt);
       
       if (response.status === 'success') {
         // Transform API response and update the specific image

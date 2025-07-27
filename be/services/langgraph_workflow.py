@@ -438,7 +438,7 @@ Generate a concise DALL-E prompt (max 300 words) that creates a professional Lin
         # Initialize OpenAI client
         client = AsyncOpenAI()
         generated_images = []
-        
+
         # Generate request_id for this batch
         request_id = str(uuid.uuid4())
 
@@ -455,13 +455,13 @@ Generate a concise DALL-E prompt (max 300 words) that creates a professional Lin
         ad_copy = state.get("ad_copy", {})
         cta_text = ad_copy.get("cta", "Learn More")
         headline = ad_copy.get("headline", f"Discover {request.product_name}")
-        
+
         for i, style in enumerate(styles):
             try:
                 # Use enhanced prompt for each style with CTA integration
                 style_key = style.value.lower()
                 base_prompt = enhanced_prompts.get(style_key, "")
-                
+
                 if base_prompt:
                     # Integrate CTA text into the enhanced prompt
                     prompt = f"{base_prompt} IMPORTANT: Include visible text overlay with CTA button showing '{cta_text}' in high contrast colors. The CTA should be prominently displayed and easily readable. Also include headline text '{headline}' in a professional font. Ensure text has 4.5:1 contrast ratio for accessibility."

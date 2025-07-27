@@ -41,17 +41,19 @@ async def stream_generate_images(request: StreamingRequest):
             def __init__(self):
                 self.queue = asyncio.Queue()
                 self.finished = False
-                
+
             async def callback(self, event_data):
-                print(f"📡 Streaming event: {event_data.get('type')} - {event_data.get('message', '')}")
+                print(
+                    f"📡 Streaming event: {event_data.get('type')} - {event_data.get('message', '')}"
+                )
                 await self.queue.put(event_data)
-                
+
             async def finish(self):
                 self.finished = True
                 await self.queue.put(None)  # Sentinel value
-        
+
         streamer = RealTimeStreamer()
-        
+
         async def generate_stream() -> AsyncGenerator[str, None]:
             try:
                 # Convert to ImageGenerationRequest
@@ -63,36 +65,35 @@ async def stream_generate_images(request: StreamingRequest):
                     body_text=request.body_text,
                     footer_text=request.footer_text,
                 )
-                
+
                 # Send initial step started event
                 yield f"data: {json.dumps({'type': 'step_started', 'step': 'company_analysis', 'message': '🔍 Starting company analysis...'})}\n\n"
-                
+
                 # Start the workflow in background
                 async def run_workflow():
                     try:
                         result = await image_service.generate_images_with_progress(
-                            image_request, 
-                            event_stream_callback=streamer.callback
+                            image_request, event_stream_callback=streamer.callback
                         )
                         await streamer.finish()
                         return result
                     except Exception as e:
-                        await streamer.queue.put({'type': 'error', 'message': str(e)})
+                        await streamer.queue.put({"type": "error", "message": str(e)})
                         await streamer.finish()
                         return None
-                
+
                 # Start workflow task
                 workflow_task = asyncio.create_task(run_workflow())
-                
+
                 # Stream events as they arrive
                 result = None
                 while True:
                     event_data = await streamer.queue.get()
-                    
+
                     if event_data is None:  # Sentinel - workflow finished
                         result = await workflow_task
                         break
-                    
+
                     # Stream the event immediately
                     yield f"data: {json.dumps(event_data)}\n\n"
 

@@ -54,7 +54,7 @@ export interface StreamEvent {
 }
 
 export interface ImageModificationRequest {
-  original_image_id: string;
+  original_image_url: string;
   modification_prompt: string;
 }
 
@@ -106,11 +106,11 @@ class ApiService {
   }
 
   async modifyImage(
-    imageId: string,
+    imageUrl: string,
     modificationPrompt: string
   ): Promise<ImageModificationResponse> {
     const requestData: ImageModificationRequest = {
-      original_image_id: imageId,
+      original_image_url: imageUrl,
       modification_prompt: modificationPrompt,
     };
 

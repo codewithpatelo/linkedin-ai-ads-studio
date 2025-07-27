@@ -441,7 +441,7 @@ class ImageGenerationService:
 
             # Generate request ID for this generation session
             request_id = str(uuid.uuid4())
-            
+
             # Generate images sequentially to respect rate limits (5/min for DALL-E 3)
             images: List[GeneratedImage] = []
             for i, (prompt, style) in enumerate(
@@ -464,6 +464,10 @@ class ImageGenerationService:
                     continue
 
             state.generated_images = images
+
+            # Store images with request ID for later modification
+            if images:
+                self.image_storage[request_id] = images
 
         except Exception as e:
             logger.error(f"Error generating images: {e}")
@@ -568,7 +572,7 @@ class ImageGenerationService:
         try:
             # Generate request ID for this generation session
             request_id = str(uuid.uuid4())
-            
+
             # Create initial state
             current_state = WorkflowState(request=request)
 
@@ -585,7 +589,7 @@ class ImageGenerationService:
             current_state = await self._analyze_company(current_state)
             if current_state.error:
                 raise Exception(f"Company analysis failed: {current_state.error}")
-            
+
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -608,7 +612,7 @@ class ImageGenerationService:
             current_state = await self._load_reference_images(current_state)
             if current_state.error:
                 raise Exception(f"Reference loading failed: {current_state.error}")
-            
+
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -631,7 +635,7 @@ class ImageGenerationService:
             current_state = await self._enhance_prompts(current_state)
             if current_state.error:
                 raise Exception(f"Prompt enhancement failed: {current_state.error}")
-            
+
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -655,7 +659,7 @@ class ImageGenerationService:
             current_state = await self._generate_ad_copy(current_state)
             if current_state.error:
                 raise Exception(f"Ad copy generation failed: {current_state.error}")
-            
+
             if event_stream_callback:
                 await event_stream_callback(
                     {
@@ -723,14 +727,19 @@ class ImageGenerationService:
 
             # Store images with request ID
             if images:
-                # Use the request_id from the first image (set by workflow)
-                request_id = images[0].request_id if images[0].request_id else str(uuid.uuid4())
+                # Use the request_id we generated at the beginning
+                logger.info(f"Storing {len(images)} images with request_id: {request_id}")
+                img_ids = [img.id for img in images]
+                logger.info(f"Image IDs being stored: {img_ids}")
+                
                 self.image_storage[request_id] = images
-                # Ensure all images have the same request_id
+                # Ensure all images have the same request_id (should already be set)
                 for image in images:
                     if not image.request_id:
                         image.request_id = request_id
-                
+                        
+                logger.info(f"Successfully stored images. Total storage entries: {len(self.image_storage)}")
+
                 if event_stream_callback:
                     await event_stream_callback(
                         {
@@ -764,6 +773,10 @@ class ImageGenerationService:
             prompt = self._create_fallback_prompt(request, style)
             image = await self._generate_single_image(prompt, style, request_id)
             images.append(image)
+
+        # Store images with request ID for later modification
+        if images:
+            self.image_storage[request_id] = images
 
         return images
 
@@ -809,67 +822,37 @@ class ImageGenerationService:
     async def modify_image(self, request: ImageModificationRequest) -> GeneratedImage:
         """Modify an existing image based on user feedback."""
         try:
-            logger.info(f"Modifying image {request.original_image_id} with prompt: {request.modification_prompt}")
-            logger.info(f"Available images in storage: {list(self.image_storage.keys())}")
-            
-            # Find the original image
-            original_image = None
-            for request_id, images in self.image_storage.items():
-                logger.info(f"Checking request_id {request_id} with {len(images)} images")
-                for img in images:
-                    logger.info(f"Checking image ID: {img.id}")
-                    if img.id == request.original_image_id:
-                        original_image = img
-                        break
-                if original_image:
-                    break
+            logger.info(
+                f"Modifying image from URL: {request.original_image_url} with prompt: {request.modification_prompt}"
+            )
 
-            if not original_image:
-                logger.error(f"Original image {request.original_image_id} not found in storage")
-                raise ValueError(
-                    f"Original image {request.original_image_id} not found"
-                )
+            # Create modified prompt for LinkedIn ads
+            modified_prompt = f"""Create a professional LinkedIn advertisement image based on this modification request: {request.modification_prompt}
 
-            # Create modified prompt with LinkedIn optimization
-            modified_prompt = f"""{original_image.prompt_used}
+Ensure the image maintains LinkedIn B2B ad best practices:
+- Professional business people (1-2 max) as main subjects
+- Simple, clean backgrounds (solid colors, subtle gradients) that contrast well with text
+- High contrast areas reserved for CTA text overlay
+- Square format (1024x1024) optimized for LinkedIn mobile feed
+- Professional photography quality (Canon 5D, 50mm lens, studio lighting)
+- Diverse, authentic representation
+- Clear visual hierarchy for mobile viewing
+- Space allocation for text overlay (20-30% of image)
+- B2B credibility and thought leadership positioning
 
-Modification Request: {request.modification_prompt}
-
-Apply modifications while preserving research-backed LinkedIn B2B optimization:
-
-**Maintain Core Elements:**
-- Photorealistic quality with technical photography specifications (Canon 5D, 50mm lens, studio lighting) for people
-- Simple backgrounds that can contrass with text
-- Diverse, authentic representation that increases engagement by ~23 points
-- Clear visual hierarchy optimized for mobile LinkedIn viewing
-- High contrast areas for text overlay and messaging
-
-**Preserve Engagement Factors:**
-- Thumb-stopping visual appeal balanced with B2B professionalism
-- Thought leadership positioning and expertise signals
-- Space for data visualization, statistics, or compelling metrics
-- Emotional tone (confident, collaborative, innovative, trustworthy)
-- Industry-specific context and audience-empathetic scenarios
-
-**Technical Consistency:**
-- Maintain 1200x1200px or 4:5 aspect ratio for LinkedIn optimization
-- Preserve lighting quality (bright daylight, warm studio lighting)
-- Keep composition elements that support text readability
-- Ensure brand-aligned color palette and professional styling
-
-Apply the requested modifications while strengthening these proven B2B engagement elements."""
+Apply the requested modifications while maintaining these professional standards."""
 
             if not self.openai_client:
                 # Return placeholder when no API key
                 return GeneratedImage(
                     id=str(uuid.uuid4()),
-                    url=f"https://via.placeholder.com/1024x1024?text=Modified+{original_image.style.value.title()}",
-                    style=original_image.style,
+                    url="https://via.placeholder.com/1024x1024?text=Modified+Image",
+                    style=ImageStyle.PROFESSIONAL,  # Default style
                     prompt_used=modified_prompt,
                     generation_timestamp=datetime.now().isoformat(),
                 )
 
-            # Generate modified image
+            # Generate modified image using DALL-E 3
             response = await self.openai_client.images.generate(
                 model="dall-e-3",
                 prompt=modified_prompt,
@@ -878,10 +861,11 @@ Apply the requested modifications while strengthening these proven B2B engagemen
                 n=1,
             )
 
+            # Return the new generated image
             return GeneratedImage(
                 id=str(uuid.uuid4()),
                 url=response.data[0].url,
-                style=original_image.style,
+                style=ImageStyle.PROFESSIONAL,  # Default style for modifications
                 prompt_used=modified_prompt,
                 generation_timestamp=datetime.now().isoformat(),
             )

@@ -14,7 +14,7 @@ class ImageGenerationRequest(BaseModel):
 
 
 class ImageModificationRequest(BaseModel):
-    original_image_id: str
+    original_image_url: str
     modification_prompt: str
 
 
