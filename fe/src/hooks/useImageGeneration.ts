@@ -131,7 +131,8 @@ export const useImageGeneration = () => {
             }
             setProgressMessage('All images generated successfully!');
             setIsGenerating(false);
-            setShowPrompts(false);
+            setShowPrompts(false); // Close the sidebar canvas
+            setCurrentStep(''); // Reset current step
             resolve(finalImages.length > 0 ? finalImages : images);
             break;
             

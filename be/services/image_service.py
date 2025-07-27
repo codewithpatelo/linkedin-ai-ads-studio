@@ -178,7 +178,7 @@ class ImageGenerationService:
            - Solid colors, subtle gradients, or minimal geometric elements ONLY
            - High contrast with the person for text overlay
            - NO offices, NO detailed environments, NO busy patterns
-           - Choose background color that complements the {style.value} style
+           - Choose background color that complements the {style.value} style !IMPORTANT!
 
         3. **Technical Specs:**
            - Square format (1:1 aspect ratio) for LinkedIn feed
@@ -196,7 +196,7 @@ class ImageGenerationService:
         The prompt should be concise (max 250 words) with the goal to create a professional LinkedIn ad image with:
         - A business person representing {state.request.audience}
         - Simple, clean background (no complex environments)
-        - {style.value} style execution
+        - Style {style.value} specs must be highly differenciated and present in the prompt.
         - High contrast for text overlay
         - Professional B2B appeal
         
@@ -213,7 +213,7 @@ class ImageGenerationService:
         **CTA Integration Requirements**:
         - Reserve 20-30% of image space for text overlay placement
         - Ensure background contrast ratio of at least 4.5:1 for accessibility
-        - Consider CTA text: "{state.request.footer_text or 'Learn More'}" when designing contrast areas
+        - Must have a CTA text: "{state.request.footer_text or 'Learn More'}" when designing contrast areas
         - Include visual elements that naturally frame or highlight CTA placement
         
         **Required Elements (Must Include ALL):**
@@ -230,6 +230,7 @@ class ImageGenerationService:
         11. **Thumb-Stopping Appeal**: Attention-grabbing elements balanced with B2B professionalism
         12. **Brand Context**: Visual elements that reflect the company's industry and professional context
         13. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
+        14. **CTA Text** : Should specify that must include CTA text: "{state.request.footer_text}" with high contrast color with background.
         """
 
                 response = await self.llm.ainvoke([HumanMessage(content=style_prompt)])
@@ -438,6 +439,9 @@ class ImageGenerationService:
             if not state.enhanced_prompts:
                 raise ValueError("No enhanced prompts available")
 
+            # Generate request ID for this generation session
+            request_id = str(uuid.uuid4())
+            
             # Generate images sequentially to respect rate limits (5/min for DALL-E 3)
             images: List[GeneratedImage] = []
             for i, (prompt, style) in enumerate(
@@ -450,7 +454,7 @@ class ImageGenerationService:
                             12
                         )  # 12 seconds between requests (5 per minute)
 
-                    image = await self._generate_single_image(prompt, style)
+                    image = await self._generate_single_image(prompt, style, request_id)
                     images.append(image)
                     logger.info(f"Generated image {i+1}/5 for style: {style}")
 
@@ -468,7 +472,7 @@ class ImageGenerationService:
         return state
 
     async def _generate_single_image(
-        self, prompt: str, style: ImageStyle
+        self, prompt: str, style: ImageStyle, request_id: str = None
     ) -> GeneratedImage:
         """Generate a single image using DALL-E 3."""
         try:
@@ -480,6 +484,7 @@ class ImageGenerationService:
                     style=style,
                     prompt_used=prompt,
                     generation_timestamp=datetime.now().isoformat(),
+                    request_id=request_id,
                 )
 
             response = await self.openai_client.images.generate(
@@ -496,6 +501,7 @@ class ImageGenerationService:
                 style=style,
                 prompt_used=prompt,
                 generation_timestamp=datetime.now().isoformat(),
+                request_id=request_id,
             )
 
         except Exception as e:
@@ -507,6 +513,7 @@ class ImageGenerationService:
                 style=style,
                 prompt_used=prompt,
                 generation_timestamp=datetime.now().isoformat(),
+                request_id=request_id,
             )
 
     def _get_style_description(self, style: ImageStyle) -> str:
@@ -559,6 +566,9 @@ class ImageGenerationService:
     ) -> List[GeneratedImage]:
         """Generate images with streaming progress updates including all workflow steps."""
         try:
+            # Generate request ID for this generation session
+            request_id = str(uuid.uuid4())
+            
             # Create initial state
             current_state = WorkflowState(request=request)
 
@@ -685,7 +695,7 @@ class ImageGenerationService:
                     if i > 0:
                         await asyncio.sleep(12)  # 12 seconds between requests
 
-                    image = await self._generate_single_image(prompt, style)
+                    image = await self._generate_single_image(prompt, style, request_id)
                     images.append(image)
 
                     if event_stream_callback:
@@ -748,10 +758,11 @@ class ImageGenerationService:
     ) -> List[GeneratedImage]:
         """Fallback image generation without LangGraph."""
         images = []
+        request_id = str(uuid.uuid4())
 
         for style in self.styles:
             prompt = self._create_fallback_prompt(request, style)
-            image = await self._generate_single_image(prompt, style)
+            image = await self._generate_single_image(prompt, style, request_id)
             images.append(image)
 
         return images
@@ -827,8 +838,8 @@ Modification Request: {request.modification_prompt}
 Apply modifications while preserving research-backed LinkedIn B2B optimization:
 
 **Maintain Core Elements:**
-- Photorealistic quality with technical photography specifications (Canon 5D, 50mm lens, studio lighting)
-- Professional B2B context and credible business scenarios
+- Photorealistic quality with technical photography specifications (Canon 5D, 50mm lens, studio lighting) for people
+- Simple backgrounds that can contrass with text
 - Diverse, authentic representation that increases engagement by ~23 points
 - Clear visual hierarchy optimized for mobile LinkedIn viewing
 - High contrast areas for text overlay and messaging
