@@ -112,7 +112,7 @@ linkedin-ads/
    - Frontend state management for real-time UI updates
 
 2. **AI-First Design**
-   - **LangGraph Workflow**: Multi-step AI pipeline (company analysis → reference loading → prompt enhancement → image generation)
+   - **Workflow-Based**: Multi-step AI pipeline (company analysis → reference loading → prompt enhancement → image generation)
    - **GPT-4o Integration**: Advanced prompt optimization with context awareness
    - **Reference Image System**: Uses 3-5 LinkedIn ad examples to improve generation quality
    - **Fallback Mechanisms**: Graceful degradation when AI services are unavailable
@@ -132,7 +132,7 @@ linkedin-ads/
 ### Key Design Patterns
 
 - **Observer Pattern**: Real-time streaming updates with SSE
-- **Strategy Pattern**: Multiple image styles and prompt enhancement strategies
+- **Strategy Pattern**: Multiple image styles and prompt enhancement strategies (self-reflection inspired)
 - **Service Layer**: Clean separation between API routes and business logic
 - **Custom Hooks**: React state management with `useImageGeneration`
 - **Component Composition**: Modular UI components with clear responsibilities
@@ -177,6 +177,7 @@ linkedin-ads/
 3. **Reference Images**: Local file system storage for MVP, cloud storage for production
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
 
+
 ### Trade-offs Made
 1. **Streaming vs Simplicity**: Added complexity for better user experience
 2. **AI Enhancement vs Speed**: Slower generation for higher quality prompts
@@ -190,15 +191,16 @@ linkedin-ads/
 - Development environment with Python 3.11+ and Node.js 18+
 
 ### Current Limitations
-1. **No persistent storage**: Images stored in memory only
-2. **No user authentication**: Open API without access controls  
-3. **Local reference images**: Limited to pre-loaded examples
-4. **No image caching**: Each request generates fresh images
-5. **Rate limiting**: Basic OpenAI API limits only
+1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. A tweak to solve this for further iterations is to complement DALL-E with something like pillow to add those texts.
+2. **No persistent storage**: Images stored in memory only
+3. **No user authentication**: Open API without access controls  
+4. **Local reference images**: Limited to pre-loaded examples
+5. **No image caching**: Each request generates fresh images
+6. **Rate limiting**: Basic OpenAI API limits only
 
 ## Future Enhancements
 
-1. **Database Integration**: PostgreSQL with image metadata storage
+1. **LinkedIn Campaign Manager Integration**: Use LinkedIn Campaign Manager to create and manage campaigns
 2. **User Authentication**: JWT-based auth system
 3. **Image Caching**: Redis for frequently requested image types
 4. **Background Processing**: Celery for async image generation

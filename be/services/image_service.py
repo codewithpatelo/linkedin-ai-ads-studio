@@ -162,8 +162,21 @@ class ImageGenerationService:
         - Target Audience: {state.request.audience}
         - Business Value: {state.request.business_value}
         - Style: {style.value}
+        - Company Analysis: {state.company_analysis or 'Professional B2B business'}
+        - Reference Images: {len(state.reference_images) if state.reference_images else 0} LinkedIn ad examples loaded for inspiration
 
         **Style Guide:** {self._get_style_description(style)}
+        
+        **Reference Context:** Based on {len(state.reference_images) if state.reference_images else 0} professional LinkedIn ad examples, 
+        ensure the generated image follows these proven patterns:
+        - Professional people in business contexts with clean, high-contrast backgrounds
+        - Strategic text placement areas with optimal contrast ratios (typically left/right thirds or bottom third)
+        - LinkedIn-optimized composition and visual hierarchy with clear focal points
+        - B2B credibility signals: confident posture, professional attire, authentic expressions
+        - Thought leadership positioning with industry-appropriate visual metaphors
+        - Color schemes that work well for text overlay: solid backgrounds, gradients, or high-contrast areas
+        - Composition patterns: headshots with negative space, full-body with clear backgrounds, or group shots with strategic positioning
+        - Technical quality: professional lighting, sharp focus on subjects, appropriate depth of field
 
         **DALL-E Prompt Requirements:**
 
@@ -231,6 +244,13 @@ class ImageGenerationService:
         12. **Brand Context**: Visual elements that reflect the company's industry and professional context
         13. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
         14. **CTA Text** : Should specify that must include CTA text: "{state.request.footer_text}" with high contrast color with background.
+        15. **Reference-Informed Design**: Drawing from {len(state.reference_images) if state.reference_images else 0} successful LinkedIn ad examples, 
+            incorporate proven visual patterns: professional headshots with strategic negative space, 
+            clean backgrounds that support text overlay, and composition that guides attention to key elements.
+        
+        **Final Instruction**: Generate a DALL-E 3 prompt that combines all above requirements with insights from 
+        the {len(state.reference_images) if state.reference_images else 0} reference LinkedIn ads to create a high-converting, 
+        professional image optimized for {state.request.audience} in the {state.request.product_name} context.
         """
 
                 response = await self.llm.ainvoke([HumanMessage(content=style_prompt)])
