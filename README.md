@@ -11,8 +11,9 @@ The pipeline is as follows:
 1. 🔍 **Company Analysis**: Based on user input, the system analyzes the company to understand their brand and context.
 2. 🖼️ **Reference Loading**: The system loads 3-5 LinkedIn ad examples to improve generation quality.
 3. ✨ **Prompt Enhancement**: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
-4. 🎨 **Image Generation**: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
-5. 🔄 **Image Modification**: The system modifies the images to improve the quality of the generated images.
+4. 📝 **Ad Copy Generation**: If user doesn't provide body text and footer text, the system generates them based on company analysis.
+5. 🎨 **Image Generation**: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
+6. 🔄 **Image Modification**: The system modifies the images to improve the quality of the generated images.
 
 ## ⚡ Quick Setup
 To make things easy. We used MAKEFILES.
