@@ -224,9 +224,9 @@ linkedin-ads/
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
 
 ### ⚖️ Trade-offs Made
-1. **Streaming vs Simplicity**: Added complexity for better user experience
+1. **Streaming vs Simplicity**: Traded some complexity for better user experience
 2. **AI Enhancement vs Speed**: Slower generation for higher quality prompts
-3. **Console View vs Simple UI**: Developer-friendly interface over simplified design
+3. **Console View vs Simple UI**: Developer-friendly interface (more appropiate for a tech demo) over production-ready design
 4. **Type Safety vs Development Speed**: Full TypeScript for maintainability
 5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development lightning fast but I sacrificed some commit history.
 6. **Quickness vs Code Structure Robustness**: For the sake of quickness and delivery I made a simplified code structure. Normally, for FE I'd implement a feature-based approach where each feature has it's own page, hook, services, etc. Similarly, for the BE I'd use something onionish to separate domain and infrastructure concerns. 
