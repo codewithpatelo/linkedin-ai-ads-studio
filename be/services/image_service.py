@@ -119,7 +119,7 @@ class ImageGenerationService:
             2. **Audience Persona Insights**: Detail target customer demographics, pain points, and visual preferences for personalized imagery
             3. **B2B Messaging Themes**: Identify key value propositions that resonate (ROI, efficiency, innovation, trust, expertise)
             4. **Professional Context Settings**: Recommend specific environments (modern office, conference room, tech lab, remote workspace)
-            5. **Inclusive Representation**: Suggest diverse, authentic professional scenarios that increase engagement by ~23 points
+            5. **Inclusive Representation**: Suggest diverse, authentic professional scenarios 
             6. **Data Visualization Elements**: Recommend incorporating charts, dashboards, metrics, or statistics relevant to the business value
             7. **Emotional Tone & Mood**: Specify lighting, expressions, and atmosphere (confident, collaborative, innovative, trustworthy)
             8. **Technical Specifications**: Recommend camera angles, composition, and photographic details for photorealistic results
@@ -163,12 +163,12 @@ class ImageGenerationService:
         - Business Value: {state.request.business_value}
         - Style: {style.value}
         - Company Analysis: {state.company_analysis or 'Professional B2B business'}
-        - Reference Images: {len(state.reference_images) if state.reference_images else 0} LinkedIn ad examples loaded for inspiration
+        - Reference Images: {len(state.reference_images) if state.reference_images else 0} LinkedIn ad examples loaded for visual analysis
 
-        **Style Guide:** {self._get_style_description(style)}
-        
-        **Reference Context:** Based on {len(state.reference_images) if state.reference_images else 0} professional LinkedIn ad examples, 
-        ensure the generated image follows these proven patterns:
+    **Style Guide:** {self._get_style_description(style)}
+    
+    **Reference Analysis Instructions:** I will provide you with {len(state.reference_images) if state.reference_images else 0} reference LinkedIn ad images for visual analysis. 
+    Please analyze these images and incorporate the following visual patterns into your DALL-E prompt:
         - Professional people in business contexts with clean, high-contrast backgrounds
         - Strategic text placement areas with optimal contrast ratios (typically left/right thirds or bottom third)
         - LinkedIn-optimized composition and visual hierarchy with clear focal points
@@ -248,12 +248,37 @@ class ImageGenerationService:
             incorporate proven visual patterns: professional headshots with strategic negative space, 
             clean backgrounds that support text overlay, and composition that guides attention to key elements.
         
-        **Final Instruction**: Generate a DALL-E 3 prompt that combines all above requirements with insights from 
-        the {len(state.reference_images) if state.reference_images else 0} reference LinkedIn ads to create a high-converting, 
-        professional image optimized for {state.request.audience} in the {state.request.product_name} context.
+        **Final Instruction**: Analyze the provided reference images and generate a DALL-E 3 prompt that combines all above requirements 
+        with visual insights from the reference LinkedIn ads. Focus on composition patterns, color schemes, subject positioning, 
+        and background styles that you observe in the references to create a high-converting, professional image optimized for 
+        {state.request.audience} in the {state.request.product_name} context.
         """
 
-                response = await self.llm.ainvoke([HumanMessage(content=style_prompt)])
+                # Create message with reference images for visual analysis
+                messages = []
+                
+                # Add the text prompt
+                messages.append(HumanMessage(content=style_prompt))
+                
+                # Add reference images if available for visual analysis
+                if state.reference_images:
+                    for i, img_data in enumerate(state.reference_images[:3]):  # Limit to 3 images to avoid token limits
+                        messages.append(HumanMessage(
+                            content=[
+                                {
+                                    "type": "text",
+                                    "text": f"Reference LinkedIn ad example {i+1} - analyze the composition, style, and visual elements:"
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{img_data}"
+                                    }
+                                }
+                            ]
+                        ))
+                
+                response = await self.llm.ainvoke(messages)
                 prompts.append(response.content.strip())
 
             state.enhanced_prompts = prompts
