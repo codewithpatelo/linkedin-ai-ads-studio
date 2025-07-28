@@ -225,7 +225,7 @@ linkedin-ads/
 4. **Component Architecture**: Sidebar overlay vs separate pages for better UX continuity
 
 ### ⚖️ Trade-offs Made
-1. **Streaming vs Simplicity**: Traded some complexity for better user experience
+1. **Streaming vs Simplicity**: Traded some simplicity for better user experience
 2. **AI Enhancement vs Speed**: Slower generation for higher quality prompts
 3. **Console View vs Simple UI**: Developer-friendly interface (more appropiate for a tech demo) over production-ready design
 4. **Type Safety vs Development Speed**: Full TypeScript for maintainability
