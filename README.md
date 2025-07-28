@@ -40,7 +40,6 @@ linkedin-ads/
 ├── README.md                   # Project documentation
 ├── docker-compose.yml          # Production Docker setup
 ├── docker-compose.dev.yml      # Development Docker setup
-├── debug_storage.py            # Debug utilities
 │
 ├── be/                         # Backend (FastAPI + Python 3.11)
 │   ├── Dockerfile              # Backend container configuration
@@ -49,7 +48,6 @@ linkedin-ads/
 │   ├── models.py               # Pydantic models for API
 │   ├── config.py               # Configuration management
 │   ├── requirements.txt        # Python dependencies
-│   ├── start.sh                # Production startup script
 │   ├── datasets/
 │   │   └── ref_imgs/           # Reference LinkedIn ad images (26 examples)
 │   │       ├── main_ref.jpg    # Primary reference image
