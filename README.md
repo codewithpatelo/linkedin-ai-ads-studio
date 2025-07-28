@@ -234,7 +234,7 @@ linkedin-ads/
 
 
 ### 🔮 Assumptions
-- Users have valid OpenAI API keys with DALL-E 3 access
+- Users have valid OpenAI API keys with DALL-E 3 access (You can try Image-GPT-1)
 - LinkedIn ad format requirements (1:1 or 4:5 aspect ratios)
 - Modern browser support for SSE and ES6+ features
 - Development environment with Python 3.11+ and Node.js 18+
