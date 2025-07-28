@@ -54,11 +54,9 @@ linkedin-ads/
 │   │       ├── main_ref2.jpg   # Additional main references
 │   │       └── *.png           # Various LinkedIn ad examples
 │   ├── routers/
-│   │   ├── __init__.py
 │   │   ├── image_generation.py # Standard image generation API
 │   │   └── streaming.py        # Real-time streaming API with SSE
 │   └── services/
-│       ├── __init__.py
 │       ├── image_service.py    # Core business logic 
 │       └── langgraph_workflow.py # Workflow definitions
 │
@@ -231,6 +229,7 @@ linkedin-ads/
 3. **Console View vs Simple UI**: Developer-friendly interface over simplified design
 4. **Type Safety vs Development Speed**: Full TypeScript for maintainability
 5. **Git Commit History Lost**: Given that I started vibe coding both FE (with Lovable) and BE (with Windsurf) some of the first commits are lost. This is because I created a new repository integrating both parts. This made development quicker but I sacrificed some commit history.
+6. **Quickness vs Code Structure Robustness**: For the sake of quickness and delivery I made a simplified code structure. Normally, for FE I'd implement a feature-based approach where each feature has it's own page, hook, services, etc. Similarly, for the BE I'd use something onionish to separate domain and infrastructure concerns. 
 
 
 ### 🔮 Assumptions
@@ -261,13 +260,12 @@ linkedin-ads/
 
 ## 🔍 Review Focus Points
 
-1. **⚡ Real-time Architecture**: SSE streaming implementation and frontend state management
+1. **⚡ Real-time Architecture**: Streaming implementation and frontend constant visual feedback
 2. **🧠 AI Integration**: Workflow design and GPT-4o prompt optimization
-3. **🧩 Component Design**: React component architecture and TypeScript usage
+3. **🧩 Types-based Design**: TypeScript and Pydantic usage
 4. **👤 User Experience**: Sidebar console design and real-time progress feedback
 5. **✅ Code Quality**: Clean separation of concerns and maintainable structure
-6. **🛡️ Error Handling**: Graceful degradation and comprehensive error boundaries
-7. **⚡ Performance**: Async processing, memory efficiency, and concurrent operations
+6. **🛡️ Error Handling**: Graceful degradation and comprehensive error handling
 
 ## 🛠️ Technology Stack
 
