@@ -240,7 +240,7 @@ linkedin-ads/
 - Development environment with Python 3.11+ and Node.js 18+
 
 ### 🚧 Current Limitations
-1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. A tweak to solve this for further iterations is to complement DALL-E with something like pillow to add those texts.
+1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. If you have access and quotas, you can use other models like Image-GPT-1. A tweak for Dall-E is to complement DALL-E with something like pillow to add those texts. 
 2. **No persistent storage**: Images stored in memory only
 3. **Some steps take long**: Some steps take longer than others, which can lead to a bad user experience. Cache, token optimization, and parallelization are some solutions to this problem.
 4. **Local reference images**: Limited to pre-loaded examples
