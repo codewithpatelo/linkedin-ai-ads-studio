@@ -290,7 +290,6 @@ Here's an example of how the AI enhances a simple user input into a detailed, op
 **Original User Input:**
 - Product: "AI powered Email"
 - Audience: "Sales Managers"
-- Style: "Professional"
 
 **Enhanced Prompt for IMAGE-GPT-1:**
 
