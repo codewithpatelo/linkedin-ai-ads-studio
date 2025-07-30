@@ -12,7 +12,7 @@ The pipeline is as follows:
 2. 🖼️ **Reference Loading**: The system loads 3-5 LinkedIn ad examples to improve generation quality.
 3. ✨ **Prompt Enhancement**: The system generates an optimized prompt to improve the quality of the generated images based on company analysis.
 4. 📝 **Ad Copy Generation**: If user doesn't provide body text and footer text, the system generates them based on company analysis.
-5. 🎨 **Image Generation**: The system uses optimized prompts to generate 5 ad images using DALL-E 3 with different styles.
+5. 🎨 **Image Generation**: The system uses optimized prompts to generate 5 ad images using IMAGE-GPT-1 with different styles and reference image integration.
 6. 🔄 **Image Modification**: The system modifies the images to improve the quality of the generated images.
 
 ## ⚡ Quick Setup
@@ -118,7 +118,7 @@ linkedin-ads/
 - **Streaming API**: `/api/v1/stream/generate` with real-time progress
 - **LangGraph Workflow**: Multi-step AI pipeline for company analysis and prompt enhancement
 - **Reference Images**: Loads 3-5 LinkedIn ad examples to improve generation quality
-- **OpenAI DALL-E 3**: High-quality image generation with fallback handling
+- **OpenAI IMAGE-GPT-1**: Advanced multimodal image generation with reference image integration
 - **Async Processing**: Concurrent operations with proper rate limiting
 
 ### Frontend (React + TypeScript + Vite)
@@ -141,7 +141,7 @@ linkedin-ads/
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- OpenAI API key with DALL-E 3 access
+- OpenAI API key with IMAGE-GPT-1 access
 
 
 ### Access Application
@@ -184,7 +184,67 @@ linkedin-ads/
 - **Custom Hooks**: React state management with `useImageGeneration`
 - **Component Composition**: Modular UI components with clear responsibilities
 
-## 📝 Example Usage
+## 🖼️ Visual Examples
+
+### Generated Images by Style
+
+#### Professional Style
+![Professional Style Example](be/static/professional_c5f7e5d6.png)
+*Clean, professional business person with high contrast background for text overlay*
+
+#### Modern Style
+![Modern Style Example](be/static/modern_05c3fcb6.png)
+*Contemporary professional with tech-forward styling on minimalist backdrop*
+
+#### Creative Style
+![Creative Style Example](be/static/creative_de42e3ef.png)
+*Expressive professional with artistic but business-appropriate styling*
+
+#### Minimalist Style
+![Minimalist Style Example](be/static/minimalist_f34b3df8.png)
+*Ultra-clean portrait with maximum simplicity and negative space*
+
+#### Bold Style
+![Bold Style Example](be/static/bold_301f2e62.png)
+*Confident professional with strong visual impact on high-contrast background*
+
+### Modified Images
+
+#### Original → Modified
+![Modified Image Example](be/static/modified_e3d0c320.png)
+*Example of image modification based on user feedback - maintains professional quality while incorporating requested changes*
+
+### Reference Image
+![Reference Image](be/static/main_ref.jpg)
+*Example LinkedIn ad reference used to guide generation style and composition*
+
+### Image URLs Structure
+
+Generated images are served via FastAPI static files:
+
+```
+# Generated Images (by style)
+http://localhost:8000/static/professional_c5f7e5d6.png
+http://localhost:8000/static/modern_05c3fcb6.png
+http://localhost:8000/static/creative_de42e3ef.png
+http://localhost:8000/static/minimalist_f34b3df8.png
+http://localhost:8000/static/bold_301f2e62.png
+
+# Modified Images
+http://localhost:8000/static/modified_e3d0c320.png
+http://localhost:8000/static/modified_58fe6197.png
+
+
+```
+
+**Naming Convention:**
+- **Generated**: `{style}_{uuid8}.png` (e.g., `professional_c5f7e5d6.png`)
+- **Modified**: `modified_{uuid8}.png` (e.g., `modified_e3d0c320.png`)
+- **Reference**: `main_ref.jpg`, `ref_2.jpg`, etc.
+
+---
+
+## 📝 API Usage Examples
 
 ### 🖼️ Generate Images Request
 ```json
@@ -234,19 +294,20 @@ linkedin-ads/
 
 
 ### 🔮 Assumptions
-- Users have valid OpenAI API keys with DALL-E 3 access
+- Users have valid OpenAI API keys with IMAGE-GPT-1 access
 - LinkedIn ad format requirements (1:1 or 4:5 aspect ratios)
 - Modern browser support for SSE and ES6+ features
 - Development environment with Python 3.11+ and Node.js 18+
 
 ### 🚧 Current Limitations
-1. **DALL-E struggles with texts**: DALL-E 3 is not designed to handle complex text-based prompts, which can lead to suboptimal results. A tweak to solve this for further iterations is to complement DALL-E with something like pillow to add those texts.
-2. **No persistent storage**: Images stored in memory only
-3. **Some steps take long**: Some steps take longer than others, which can lead to a bad user experience. Cache, token optimization, and parallelization are some solutions to this problem.
-4. **Local reference images**: Limited to pre-loaded examples
-5. **No image caching**: Each request generates fresh images
-6. **Rate limiting**: Basic OpenAI API limits only
-7. **Modification feature**: While we take the original image as input, DALL-E 3 will probably vary the image considerably due to its own limitations.
+1. **IMAGE-GPT-1 text handling**: While IMAGE-GPT-1 has improved multimodal capabilities compared to DALL-E 3, complex text overlays may still benefit from post-processing with tools like Pillow for optimal text placement.
+2. **Prompt engineering optimized for people**: Current style descriptions are optimized for generating professional people rather than products, objects, or other characters. This is easily adjustable through prompt engineering modifications.
+3. **No persistent storage**: Images stored in memory only
+4. **Some steps take long**: Some steps take longer than others, which can lead to a bad user experience. Cache, token optimization, and parallelization are some solutions to this problem.
+5. **Local reference images**: Limited to pre-loaded examples
+6. **No image caching**: Each request generates fresh images
+7. **Rate limiting**: Basic OpenAI API limits only
+8. **Modification feature**: While we take the original image as input, IMAGE-GPT-1's multimodal approach provides better consistency but may still vary the image due to the generative nature of the model.
 
 
 ## 🚀 Future Enhancements
@@ -257,7 +318,9 @@ linkedin-ads/
 4. **📝 Add texts to images**: Use pillow to add high-contrast texts to images
 5. **📊 Advanced Analytics**: LangSmith integration for prompt performance
 6. **🕸️ Web Scraping**: Automated company information extraction
-7. **🔬 A/B Testing**: Comparison and production of multiple prompt strategies, multiple CTAs, multiple body texts.
+7. **🔬 A/B Testing**: Comparison and production of multiple prompt strategies, multiple CTAs, multiple body texts
+8. **📡 OpenAI Streaming for Image Generation**: Implement OpenAI's streaming API to show real-time progress during image generation, providing users with live updates on generation status
+9. **👁️ Computer Vision Spell Checking**: Integrate computer vision technology (OCR + spell checking) to automatically detect spelling errors in generated images and trigger automatic re-modification to correct them
 
 ## 🔍 Review Focus Points
 
@@ -272,7 +335,7 @@ linkedin-ads/
 
 ### Backend
 - **Framework**: FastAPI with Python 3.11+
-- **AI/ML**: LangChain, LangGraph, OpenAI DALL-E 3 + GPT-4o
+- **AI/ML**: LangChain, LangGraph, OpenAI IMAGE-GPT-1 + GPT-4o
 - **Streaming**: Server-Sent Events (SSE) with async generators
 - **HTTP**: aiohttp for async HTTP operations
 
