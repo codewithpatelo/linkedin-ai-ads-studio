@@ -283,6 +283,37 @@ http://localhost:8000/static/modified_58fe6197.png
 }
 ```
 
+### 🎯 Enhanced Prompt Example
+
+Here's an example of how the AI enhances a simple user input into a detailed, optimized prompt for IMAGE-GPT-1:
+
+**Original User Input:**
+- Product: "AI powered Email"
+- Audience: "Sales Managers"
+- Style: "Professional"
+
+**Enhanced Prompt for IMAGE-GPT-1:**
+
+```
+Create a professional LinkedIn ad image of a confident sales manager, a middle-aged woman of diverse ethnicity, dressed in a navy blue blazer, smiling warmly while engaging with a sleek digital dashboard displaying sales metrics. The background should be a simple, high-contrast solid light gray color, ensuring the subject stands out prominently. Use studio lighting to create a warm and inviting atmosphere, highlighting the professionalism and approachability of the subject.
+
+The image composition should focus on the upper body of the sales manager, shot on a Canon 5D with a 50mm lens, utilizing a shallow depth of field to keep the attention on her. Reserve 30% of the image space in the bottom third for a bold CTA text area, ensuring a contrast ratio of at least 4.5:1 for accessibility. This text overlay should say 'Buy now' in bright orange font, positioned against the light gray background for maximum visibility.
+
+Emphasize B2B credibility through her confident posture and authentic expression, showcasing the innovative spirit of SuperTiki's AI-powered mailing solution. Optimize the image for mobile viewing with a clear visual hierarchy, ensuring thumb-stopping appeal while maintaining a professional tone suitable for sales managers. Include elements that subtly suggest boldness, such as upward-trending graphs or metrics in the background, enhancing the overall context of efficiency and innovation.
+
+IMPORTANT: Generate image in exactly 1024x1024 pixels resolution. Ensure proper aspect ratio and high quality.
+```
+
+**Key Enhancement Features:**
+- 🎯 **Specific Demographics**: Detailed person description for better targeting
+- 🎨 **Technical Specifications**: Camera settings, lighting, composition details
+- 📱 **Mobile Optimization**: Clear visual hierarchy and thumb-stopping appeal
+- ♿ **Accessibility**: Contrast ratios and text overlay considerations
+- 🎪 **Brand Context**: Integration of product benefits and audience needs
+- 📏 **Resolution Guardrails**: Explicit size requirements for consistency
+
+---
+
 ## 🔑 Key Decisions & Trade-offs
 
 ### 🛠️ Technical Decisions
