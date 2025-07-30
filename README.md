@@ -189,33 +189,40 @@ linkedin-ads/
 ### Generated Images by Style
 
 #### Professional Style
-![Professional Style Example](be/static/professional_c5f7e5d6.png)
+<img src="be/static/professional_c5f7e5d6.png" alt="Professional Style Example" width="300" height="300">
+
 *Clean, professional business person with high contrast background for text overlay*
 
 #### Modern Style
-![Modern Style Example](be/static/modern_05c3fcb6.png)
+<img src="be/static/modern_05c3fcb6.png" alt="Modern Style Example" width="300" height="300">
+
 *Contemporary professional with tech-forward styling on minimalist backdrop*
 
 #### Creative Style
-![Creative Style Example](be/static/creative_de42e3ef.png)
+<img src="be/static/creative_de42e3ef.png" alt="Creative Style Example" width="300" height="300">
+
 *Expressive professional with artistic but business-appropriate styling*
 
 #### Minimalist Style
-![Minimalist Style Example](be/static/minimalist_f34b3df8.png)
+<img src="be/static/minimalist_f34b3df8.png" alt="Minimalist Style Example" width="300" height="300">
+
 *Ultra-clean portrait with maximum simplicity and negative space*
 
 #### Bold Style
-![Bold Style Example](be/static/bold_301f2e62.png)
+<img src="be/static/bold_301f2e62.png" alt="Bold Style Example" width="300" height="300">
+
 *Confident professional with strong visual impact on high-contrast background*
 
 ### Modified Images
 
 #### Original → Modified
-![Modified Image Example](be/static/modified_e3d0c320.png)
+<img src="be/static/modified_e3d0c320.png" alt="Modified Image Example" width="300" height="300">
+
 *Example of image modification based on user feedback - maintains professional quality while incorporating requested changes*
 
 ### Reference Image
-![Reference Image](be/static/main_ref.jpg)
+<img src="be/static/main_ref.jpg" alt="Reference Image" width="300" height="200">
+
 *Example LinkedIn ad reference used to guide generation style and composition*
 
 ### Image URLs Structure
