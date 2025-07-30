@@ -30,6 +30,12 @@ from models import (
 logger = logging.getLogger(__name__)
 
 
+class ReferenceImage(BaseModel):
+    """Model for reference image data."""
+    id: str
+    base64_image: str
+
+
 class WorkflowState(BaseModel):
     """State for the LangGraph workflow."""
 
@@ -37,7 +43,7 @@ class WorkflowState(BaseModel):
     company_analysis: Optional[str] = None
     enhanced_prompts: Optional[List[str]] = None
     ad_copy: Optional[Dict[str, str]] = None  # headline, description, cta
-    reference_images: Optional[List[str]] = None  # base64 encoded reference images
+    reference_images: Optional[List[ReferenceImage]] = None  # reference image objects
     generated_images: Optional[List[GeneratedImage]] = None
     error: Optional[str] = None
 
@@ -153,7 +159,7 @@ class ImageGenerationService:
                     continue
 
                 style_prompt = f"""
-        Create a highly-optimized DALL-E 3 prompt for a LinkedIn ad image with people (1 or 2 people max) on a simple background and a CTA text with high-contrass background.
+        Create a highly-optimized DALL-E 3 | IMAGE-GPT-1 prompt for a LinkedIn ad image with people (1 or 2 people max) on a simple background and a CTA text with high-contrass background.
         
         Use the proven prompt structure: ACTION + SUBJECT + CONTEXT + VISUAL DETAILS + STYLE CUES + CTA OPTIMIZATION
 
@@ -163,12 +169,10 @@ class ImageGenerationService:
         - Business Value: {state.request.business_value}
         - Style: {style.value}
         - Company Analysis: {state.company_analysis or 'Professional B2B business'}
-        - Reference Images: {len(state.reference_images) if state.reference_images else 0} LinkedIn ad examples loaded for visual analysis
 
     **Style Guide:** {self._get_style_description(style)}
     
-    **Reference Analysis Instructions:** I will provide you with {len(state.reference_images) if state.reference_images else 0} reference LinkedIn ad images for visual analysis. 
-    Please analyze these images and incorporate the following visual patterns into your DALL-E prompt:
+    **Reference Analysis Instructions:** Incorporate the following visual patterns into your DALL-E | IMAGE-GPT-1 prompt:
         - Professional people in business contexts with clean, high-contrast backgrounds
         - Strategic text placement areas with optimal contrast ratios (typically left/right thirds or bottom third)
         - LinkedIn-optimized composition and visual hierarchy with clear focal points
@@ -178,7 +182,7 @@ class ImageGenerationService:
         - Composition patterns: headshots with negative space, full-body with clear backgrounds, or group shots with strategic positioning
         - Technical quality: professional lighting, sharp focus on subjects, appropriate depth of field
 
-        **DALL-E Prompt Requirements:**
+        **DALL-E | IMAGE-GPT-1 Prompt Requirements:**
 
         1. **Main Subject:** Professional business people (not more than 1 or 2 people) representing {state.request.audience}
            - Confident, approachable expression
@@ -244,11 +248,8 @@ class ImageGenerationService:
         12. **Brand Context**: Visual elements that reflect the company's industry and professional context
         13. **Value Visualization**: Visual metaphors or direct representations of {state.request.business_value}
         14. **CTA Text** : Should specify that must include CTA text: "{state.request.footer_text}" with high contrast color with background.
-        15. **Reference-Informed Design**: Drawing from {len(state.reference_images) if state.reference_images else 0} successful LinkedIn ad examples, 
-            incorporate proven visual patterns: professional headshots with strategic negative space, 
-            clean backgrounds that support text overlay, and composition that guides attention to key elements.
         
-        **Final Instruction**: Analyze the provided reference images and generate a DALL-E 3 prompt that combines all above requirements 
+        **Final Instruction**: Analyze the provided reference images and generate a DALL-E 3 | IMAGE-GPT-1prompt that combines all above requirements 
         with visual insights from the reference LinkedIn ads. Focus on composition patterns, color schemes, subject positioning, 
         and background styles that you observe in the references to create a high-converting, professional image optimized for 
         {state.request.audience} in the {state.request.product_name} context.
@@ -260,23 +261,7 @@ class ImageGenerationService:
                 # Add the text prompt
                 messages.append(HumanMessage(content=style_prompt))
                 
-                # Add reference images if available for visual analysis
-                if state.reference_images:
-                    for i, img_data in enumerate(state.reference_images[:3]):  # Limit to 3 images to avoid token limits
-                        messages.append(HumanMessage(
-                            content=[
-                                {
-                                    "type": "text",
-                                    "text": f"Reference LinkedIn ad example {i+1} - analyze the composition, style, and visual elements:"
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": f"data:image/jpeg;base64,{img_data}"
-                                    }
-                                }
-                            ]
-                        ))
+ 
                 
                 response = await self.llm.ainvoke(messages)
                 prompts.append(response.content.strip())
@@ -290,7 +275,8 @@ class ImageGenerationService:
         return state
 
     async def _load_reference_images(self, state: WorkflowState) -> WorkflowState:
-        """Load and encode reference images: 1 main_ref + 5 random non-main images."""
+        """Load and encode reference images: 1 main_ref + 1 random non-main images."""
+
         try:
             reference_images = []
             # Use correct path relative to the backend directory
@@ -318,10 +304,12 @@ class ImageGenerationService:
                         main_ref_file = random.choice(main_ref_files)
                         try:
                             with open(main_ref_file, "rb") as img_file:
-                                img_data = base64.b64encode(img_file.read()).decode(
-                                    "utf-8"
+                                img_data = base64.b64encode(img_file.read()).decode("utf-8")
+                                result = await self.openai_client.files.create(
+                                    file=img_file,
+                                    purpose="vision",
                                 )
-                                reference_images.append(img_data)
+                                reference_images.append(ReferenceImage(id=result.id, base64_image=img_data))
                                 logger.info(
                                     f"Loaded main reference: {main_ref_file.name}"
                                 )
@@ -330,19 +318,21 @@ class ImageGenerationService:
                                 f"Could not load main reference {main_ref_file}: {e}"
                             )
 
-                    # Load up to 5 random other images (non-main_ref)
+                    # Load up to 2 random other images (non-main_ref)
                     if other_files:
                         selected_other_files = random.sample(
-                            other_files, min(5, len(other_files))
+                            other_files, min(2, len(other_files))
                         )
 
                         for img_path in selected_other_files:
                             try:
                                 with open(img_path, "rb") as img_file:
-                                    img_data = base64.b64encode(img_file.read()).decode(
-                                        "utf-8"
+                                    img_data = base64.b64encode(img_file.read()).decode("utf-8")
+                                    result = await self.openai_client.files.create(
+                                        file=img_file,
+                                        purpose="vision",
                                     )
-                                    reference_images.append(img_data)
+                                    reference_images.append(ReferenceImage(id=result.id, base64_image=img_data))
                             except Exception as e:
                                 logger.warning(
                                     f"Could not load reference image {img_path}: {e}"
@@ -451,9 +441,9 @@ class ImageGenerationService:
             Return ONLY the JSON with no additional text or formatting.
             """
             if state.request.body_text:
-                copy_prompt += f"\n\nfill out description field with this text: {state.request.body_text}"
+                copy_prompt += f"\n\n override description field with this text: {state.request.body_text}"
             if state.request.footer_text:
-                copy_prompt += f"\n\nfill out cta field with this text: {state.request.footer_text}"
+                copy_prompt += f"\n\n override cta field with this text: {state.request.footer_text}"
 
             response = await self.llm.ainvoke([HumanMessage(content=copy_prompt)])
 
@@ -524,7 +514,7 @@ class ImageGenerationService:
         return state
 
     async def _generate_single_image(
-        self, prompt: str, style: ImageStyle, request_id: str = None
+        self, prompt: str, style: ImageStyle, request_id: str = None, state: Optional[WorkflowState] = None
     ) -> GeneratedImage:
         """Generate a single image using DALL-E 3."""
         try:
@@ -532,24 +522,79 @@ class ImageGenerationService:
                 # Return placeholder when no API key
                 return GeneratedImage(
                     id=str(uuid.uuid4()),
-                    url=f"https://via.placeholder.com/1024x1024?text=Modified+{style.value.title()}",
+                    url=f"https://placeholdit.com/1024x1024/f3f4f6/6b7280?text=Modified+{style.value.title()}",
                     style=style,
                     prompt_used=prompt,
                     generation_timestamp=datetime.now().isoformat(),
                     request_id=request_id,
                 )
+                
 
-            response = await self.openai_client.images.generate(
-                model="dall-e-3",
-                prompt=prompt,
-                size="1024x1024",
-                quality="standard",
-                n=1,
+
+            # Add resolution requirement to prompt
+            enhanced_prompt = f"{prompt}\n\nIMPORTANT: Generate image in exactly 1024x1024 pixels resolution. Ensure proper aspect ratio and high quality."
+        
+            # Build content with prompt and reference images
+            content = [{"type": "input_text", "text": enhanced_prompt}]
+            
+            # Add reference images if available in state
+            if state and state.reference_images:
+                for ref_img in state.reference_images:
+                    content.append({
+                        "type": "input_image",
+                        "image_url": f"data:image/jpeg;base64,{ref_img.base64_image}",
+                    })
+                    # Also add file_id if available
+                    if hasattr(ref_img, 'id') and ref_img.id:
+                        content.append({
+                            "type": "input_image",
+                            "file_id": ref_img.id,
+                        })
+
+            response = await self.openai_client.responses.create(
+                model="gpt-4.1",
+                input=[
+                    {
+                        "role": "user", 
+                        "content": content
+                    }
+                ],
+                tools=[{"type": "image_generation"}],
             )
+            
+            image_generation_calls = [
+                output
+                for output in response.output
+                if output.type == "image_generation_call"
+            ]
+            
+            image_data = [output.result for output in image_generation_calls]
+            
+
+            
+            # Create static directory if it doesn't exist
+            static_dir = Path(__file__).parent.parent / "static"
+            static_dir.mkdir(exist_ok=True)
+            
+            # Generate image name with style prefix
+            image_id = str(uuid.uuid4())[:8]
+            image_name = f"{style.value}_{image_id}.png"
+            image_path = static_dir / image_name
+            
+            if image_data:
+                image_base64 = image_data[0]
+                with open(image_path, "wb") as f:
+                    f.write(base64.b64decode(image_base64))
+            else:
+                print(response.output.content)
+
+            
+            # Create localhost URL
+            image_url = f"http://localhost:8000/static/{image_name}"
 
             return GeneratedImage(
                 id=str(uuid.uuid4()),
-                url=response.data[0].url,
+                url=image_url,
                 style=style,
                 prompt_used=prompt,
                 generation_timestamp=datetime.now().isoformat(),
@@ -557,11 +602,11 @@ class ImageGenerationService:
             )
 
         except Exception as e:
-            logger.error(f"DALL-E generation error: {e}")
+            logger.error(f"Image Generation error: {e}")
             # Return placeholder on error
             return GeneratedImage(
                 id=str(uuid.uuid4()),
-                url="https://via.placeholder.com/1024x1024?text=Generation+Error",
+                url="https://placeholdit.com/1024x1024/f3f4f6/6b7280",
                 style=style,
                 prompt_used=prompt,
                 generation_timestamp=datetime.now().isoformat(),
@@ -892,35 +937,111 @@ Ensure the image maintains LinkedIn B2B ad best practices:
 - Space allocation for text overlay (20-30% of image)
 - B2B credibility and thought leadership positioning
 
+IMPORTANT: Generate image in exactly 1024x1024 pixels resolution. Ensure proper aspect ratio and high quality.
+
 Apply the requested modifications while maintaining these professional standards."""
 
             if not self.openai_client:
                 # Return placeholder when no API key
                 return GeneratedImage(
                     id=str(uuid.uuid4()),
-                    url="https://via.placeholder.com/1024x1024?text=Modified+Image",
+                    url="https://placeholdit.com/1024x1024/f3f4f6/6b7280?text=?text=Modified+Image",
                     style=ImageStyle.PROFESSIONAL,  # Default style
                     prompt_used=modified_prompt,
                     generation_timestamp=datetime.now().isoformat(),
                 )
+                
+            # Build content with prompt and reference images
+            content = [{"type": "input_text", "text": modified_prompt}]
+            
+            reference_images = []
+            
 
-            # Generate modified image using DALL-E 3
-            response = await self.openai_client.images.generate(
-                model="dall-e-3",
-                prompt=modified_prompt,
-                size="1024x1024",
-                quality="standard",
-                n=1,
+            static_dir = Path(__file__).parent.parent / "static"
+            static_dir.mkdir(exist_ok=True)
+            
+            # Extract image name from URL: http://localhost:8000/static/{image_name}
+            image_name = request.original_image_url.split("/static/")[-1]
+            
+            image_path = static_dir / image_name
+            
+            with open(image_path, "rb") as img_file:
+                                img_data = base64.b64encode(img_file.read()).decode("utf-8")
+                                result = await self.openai_client.files.create(
+                                    file=img_file,
+                                    purpose="vision",
+                                )
+                                reference_images.append(ReferenceImage(id=result.id, base64_image=img_data))
+                                logger.info(
+                                    f"Loaded main reference: {request.original_image_url}"
+                                )
+            
+            
+            # Add reference images if available in state
+            if reference_images:
+                for ref_img in reference_images:
+                    content.append({
+                        "type": "input_image",
+                        "image_url": f"data:image/jpeg;base64,{ref_img.base64_image}",
+                    })
+                    # Also add file_id if available
+                    if hasattr(ref_img, 'id') and ref_img.id:
+                        content.append({
+                            "type": "input_image",
+                            "file_id": ref_img.id,
+                        })
+
+            response = await self.openai_client.responses.create(
+                model="gpt-4.1",
+                input=[
+                    {
+                        "role": "user", 
+                        "content": content
+                    }
+                ],
+                tools=[{"type": "image_generation"}],
             )
+            
+            image_generation_calls = [
+                output
+                for output in response.output
+                if output.type == "image_generation_call"
+            ]
+            
+            image_data = [output.result for output in image_generation_calls]
+            
 
-            # Return the new generated image
+            
+            # Create static directory if it doesn't exist
+            static_dir = Path(__file__).parent.parent / "static"
+            static_dir.mkdir(exist_ok=True)
+            
+            # Generate image name with modified prefix
+            image_id = str(uuid.uuid4())[:8]
+            image_name = f"modified_{image_id}.png"
+            image_path = static_dir / image_name
+            
+            if image_data:
+                image_base64 = image_data[0]
+                with open(image_path, "wb") as f:
+                    f.write(base64.b64decode(image_base64))
+            else:
+                print(response.output.content)
+
+            
+            # Create localhost URL
+            image_url = f"http://localhost:8000/static/{image_name}"
+            
+             # Return the new generated image
             return GeneratedImage(
                 id=str(uuid.uuid4()),
-                url=response.data[0].url,
+                url=image_url,
                 style=ImageStyle.PROFESSIONAL,  # Default style for modifications
                 prompt_used=modified_prompt,
                 generation_timestamp=datetime.now().isoformat(),
             )
+
+          
 
         except Exception as e:
             logger.error(f"Error modifying image: {e}")

@@ -1,7 +1,9 @@
 import uvicorn
+import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from routers import image_generation, streaming
 
@@ -26,6 +28,9 @@ app.add_middleware(
 # Include routers
 app.include_router(image_generation.router, prefix="/api/v1")
 app.include_router(streaming.router, prefix="/api/v1")
+
+# Mount static files directory
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
 
 
 @app.get("/")

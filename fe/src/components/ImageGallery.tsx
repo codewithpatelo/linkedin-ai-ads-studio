@@ -110,7 +110,7 @@ const LinkedInAdCard = ({
           <img
             src={image.url}
             alt={`LinkedIn ad - ${image.style}`}
-            className="w-full aspect-[4/3] object-cover"
+            className="w-full aspect-[4/3] object-scale-down bg-gray-50"
           />
           <div className="absolute top-3 right-3">
             <Badge className="bg-black/70 text-white text-xs px-2 py-1">
